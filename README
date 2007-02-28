@@ -1,0 +1,48 @@
+GetHT - The Free Hinduism Today Digital Edition Fetcher
+
+Summary:
+The nice people at Hinduism Today have recently begun freely distributing
+their magazine in pdf format, so that anybody may read a copy for free.
+
+However, rather than provide links to the PDF files on their website,
+they ask users to download their software which then downloads and opens
+the PDFs itself.
+
+This unfortunately means those who are not using a Mac or Windows PC are
+unable to download the new issues.
+
+This program is written to change all that.
+
+License:
+htde is released under the GPL, see the file COPYING for details.
+Basically this means that you are free to study the program, modify it,
+and redistribute it however you see fit, provided you extend the same
+freedom to others by releasing derivatives with the same license.
+
+Proxy Support:
+GetHT supports HTTP, SOCKS4 & SOCKS5 proxys (though they haven't been
+thoroughly tested - let me know if there are any problems).
+Environmental variables (e.g. http_proxy) are used, but may be overridden
+with the following lines in the config.ini file. Any lines which are not
+needed (for example the authentication lines) should just be omitted.
+The format of the options is:
+proxy_type <type_of_proxy> (http, socks4 or socks5)
+proxy_address <address>
+proxy_port <port>
+proxy_auth <proxy_auth_method> (none, basic, digest or ntlm)
+proxy_user <proxy_username>
+proxy_pass <proxy_password>
+
+Dependancies:
+libxml2         To parse the contents and media files; ensure to compile
+                with zlib support
+libcurl 7.7.2+  To download the necessary issues and periphery
+Unless compiled with "make nogui":
+fltk    2.0+    To draw and control the windows
+
+Install:
+The project is too small to warrent autoconf or anything else complex,
+so simply use the makefile provided to compile and install the software
+from source.
+
+For more details see the included INSTALL file.

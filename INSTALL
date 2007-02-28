@@ -1,0 +1,21 @@
+The project is too small to warrent autoconf or anything else complex,
+so simply use the makefile provided to compile and install the software
+from source.
+
+For a default install all that is needed is the following:
+
+1. Decompress/archive the project file:
+	tar -xzf getht-<version>.tar.gz
+or
+	tar -xyf getht-<version>.tar.bz2
+
+2. Change to hdte directory:
+	cd getht-<version>
+
+3. Run make to compile the source:
+	make
+
+4. Use make again to install it (you'll need to have root privilages):
+	make install
+
+For further build options, see the output of "make help"
