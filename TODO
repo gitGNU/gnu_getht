@@ -2,15 +2,13 @@
 
 add news, with current status, likely time to usability, & hello
 
-checkin to arch
-
-add tasks to tracker
-
-look into getting a commit mailing list (writable) to work
+add todo to tasks tracker
 
 post a screenshot?
 
 -immediate term-
+
+add long options
 
 save entered directories to config file
 
@@ -28,18 +26,15 @@ handle file errors better
 
 -malloc-
 
-redo passing memory pointers rather than whole arrays etc.
+include cover as just another section entry
 
 malloc sections, items, and media
 	will ensure ease of finding existance, as no_of_sections no_of_media no_of_items can be used (embedded in struct)
-
-reduce code duplication
 
 handle smil files successfully
 
 if no required contents file exists, attempt to retrieve it, even if update is not passed
 comment source - at least all functions
-add long options
 
 use autotools
 integrate gettext

@@ -111,6 +111,8 @@ void save_file(CURL *curl_handle, char *url, char *filepath)
 		printf("Content Length: %lf\n",d);
 */
 		fclose(file);
+
+		printf("\r");
 	}
 	else {
 		fprintf(stderr,"Error: curl failed to initialise.\n");
@@ -124,7 +126,7 @@ int update_progress(void *data, double dltotal, double dlnow,
 {
 	double frac;
 	frac = 100 * dlnow / dltotal;
-	printf("\rDownloading... %3.0lf%% ", frac);
+	printf("\rDownload progress: %3.0lf%% ", frac);
 	fflush(stdout);
 
 	return 0;
