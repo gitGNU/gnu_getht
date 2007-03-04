@@ -190,10 +190,11 @@ iss ** parsemedia(char * filepath, iss ** issue, int * no_of_issues)
 
 				strncpy(issue[*no_of_issues]->title, (char *) xmlGetProp(node, "title"), STR_MAX);
 
-				issue[*no_of_issues]->no_of_media = -1;
+				tmp = *no_of_issues;
 			}
 
-			cur_media = issue[(*no_of_issues)]->media;
+			issue[tmp]->no_of_media = -1;
+			cur_media = issue[tmp]->media;
 
 
 			itnode = node->xmlChildrenNode;
@@ -215,7 +216,7 @@ iss ** parsemedia(char * filepath, iss ** issue, int * no_of_issues)
 
 					strncpy(cur_media->title, (char *) xmlNodeListGetString(media_file, itnode->xmlChildrenNode, 1), STR_MAX);
 
-					issue[*no_of_issues]->no_of_media++;
+					issue[tmp]->no_of_media++;
 
 					cur_media++;
 				}

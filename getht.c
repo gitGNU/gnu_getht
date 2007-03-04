@@ -191,7 +191,7 @@ int main(int argc, char *argv[])
 		med * cur_media;
 		int newest;
 
-		issue = parsemedia(media_xml, &issue, &no_of_issues);
+		issue = parsemedia(media_xml, issue, &no_of_issues);
 
 		if(downlatestmedia)
 		{

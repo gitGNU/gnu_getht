@@ -94,6 +94,7 @@ iss ** parsetoc(char *filepath, int * iss_no, int * latest)
 
 					issue = tmp;
 
+					issue[no_of_issues]->no_of_media = -1; /* set default no of media */
 					issue[no_of_issues]->date.year = atoi( (const char *)(xmlStrsub(node->name,5,4)) );
 					tokenise_hyphons(xmlStrsub(cnode->name,6,5), &(issue[no_of_issues]->date.firstmonth), &(issue[no_of_issues]->date.lastmonth));
 					issue[no_of_issues]->no_of_sections = parseissue(file, cnode, issue[no_of_issues], latest);
