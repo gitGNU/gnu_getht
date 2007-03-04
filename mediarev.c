@@ -26,7 +26,9 @@
 #include "getht.h"
 #include "issue.h"
 
+int smilurl(char * smilurl, med * cur_media);
 void getquote(char * input, char * label);
+void removeleadingspace(char * cur_line);
 
 int parsemediagz(char * media_path, med * cur_media, int * no_of_media)
 /*	Parses gzipped adobe pagemaker files for media urls and metadata,
@@ -51,30 +53,27 @@ int parsemediagz(char * media_path, med * cur_media, int * no_of_media)
 			{
 				strcpy(cur_line,""); /* reset cur_line */
 				gzgets(mediagz, cur_line, STR_MAX);
-				cur_line[strlen(cur_line)-1] = '\0'; /* get rid of trailing newline */
+				cur_line[strlen(cur_line)-1] = '\0'; /* remove trailing newline */
 
-				if(!strncmp(cur_line,"    set the filename of player \"player1\" to \"",45))
+				removeleadingspace(cur_line);
+
+				if(!strncmp(cur_line,"set the filename of player \"player1\" to \"",41))
 				{
-					/* todo: if smil follow, otherwise load into media->url */
-					sscanf(cur_line,"    set the filename of player \"player1\" to \"%s\"",cur_media->uri);
-					cur_media->uri[strlen(cur_media->uri)-1] = '\0'; /* workaround extra final character */
+					/* todo: check if smil, if so follow to find uri */
+					sscanf(cur_line,"set the filename of player \"player1\" to \"%s\"",cur_media->uri);
+					cur_media->uri[strlen(cur_media->uri)-1] = '\0'; /* workaround extra character */
 				}
-				else if(!strncmp(cur_line,"    set the label of this stack to \"",36))
+				else if(!strncmp(cur_line,"set the label of this stack to \"",32))
 				{
 					getquote(cur_line,cur_media->title);
 				}
-				else if(!strncmp(cur_line,"    statusMsg \(\"",16))
+				else if(!strncmp(cur_line,"statusMsg \(\"",12))
 				{
 					getquote(cur_line,cur_media->comment);
 				}
-			/*	else
-			 *		fprintf(stderr,"Interesting line to put in struct: '%s'\n",cur_line);
-			 */
-			 
 			}
 			*cur_media++;
 			(*no_of_media)++;
-			cur_media->uri[0] = '\0';
 		}
 		strcpy(cur_line,""); /* reset cur_line */
 	}
@@ -110,4 +109,25 @@ void getquote(char * input, char * quote)
 	}
 
 	*cur_pos = '\0';
+}
+
+void removeleadingspace(char * cur_line)
+{
+	int tmp, newpos;
+
+	char temp_str[STR_MAX];
+
+	/* advance past whitespace */
+	tmp = 0;
+	while (cur_line[tmp] == ' ' || cur_line[tmp] == '\t')
+		tmp++;
+
+	/* copy from there to temp_str */
+	for(newpos = 0; cur_line[tmp]; tmp++, newpos++)
+		temp_str[newpos] = cur_line[tmp];
+
+	temp_str[newpos] = '\0';
+
+	/* copy temp_str to cur_line */
+	strncpy(cur_line, temp_str, sizeof(temp_str));
 }

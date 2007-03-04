@@ -112,7 +112,7 @@ void save_file(CURL *curl_handle, char *url, char *filepath)
 */
 		fclose(file);
 
-		printf("\r");
+		printf("\n");
 	}
 	else {
 		fprintf(stderr,"Error: curl failed to initialise.\n");
@@ -152,7 +152,8 @@ void downloadissue(CURL *curl_handle, char * directory, iss * issue, int force)
 			scanf("%s", newdir); /* TODO: incorporate tab-completion */
 		}
 
-	if(issue->cover.title[0])
+	/* not reliable - workaround until malloc is completed */
+	if(!strncmp(issue->cover.uri, "http://www.", 11))
 	{
 		snprintf(filename,STR_MAX,"%s/cover.pdf", newdir);
 		if(!force){
