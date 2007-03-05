@@ -22,6 +22,7 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <unistd.h>
+#include <getopt.h>
 #include <string.h>
 #include <sys/stat.h>
 #include <curl/curl.h>
@@ -35,6 +36,8 @@ void show_med_struct(med * issue);
 
 void clearmed(med * cur_media);
 void cleariss(iss * cur_issue);
+
+void showusage();
 
 med * findnewestmed(iss ** issue, int no_of_issues);
 
@@ -93,7 +96,20 @@ int main(int argc, char *argv[])
 
 	/* Parse command line options */
 	char c;
-	while((c = getopt(argc, argv, "adfhmnsuvxt:")) != -1) {
+	static struct option long_opts[] =
+	{
+		{"download-all", no_argument, 0, 'a'},
+		{"download-latest", no_argument, 0, 'd'},
+		{"download-all-media", no_argument, 0, 'm'},
+		{"download-latest-media", no_argument, 0, 'n'},
+		{"force", no_argument, 0, 'f'},
+		{"update", no_argument, 0, 'u'},
+		{"tocfile", required_argument, 0, 't'},
+		{"help", no_argument, 0, 'h'},
+		{"version", no_argument, 0, 'v'},
+		{0, 0, 0, 0}
+	};
+	while((c = getopt_long(argc, argv, "adfhmnsuvxt:", long_opts, NULL)) != -1) {
 		switch(c) {
 			case 'a':
 				downall = 1;
@@ -124,18 +140,7 @@ int main(int argc, char *argv[])
 				strcpy(issue_xml, strdup(optarg));
 				break;
 			case 'h':
-				printf("Usage: getht -am dn -f [-t tocfile] -u -hv\n");
-				printf("-a       Download all issues\n");
-				printf("-d       Download latest issue\n");
-				printf("-m       Download all media\n");
-				printf("-n       Download latest issue's media\n");
-				printf("-f       Force redownloading of existent issues\n");
-				printf("-u       Download new contents files\n");
-				printf("-t file  Use alternative contents xml file\n");
-				printf("-h       Print this help message\n");
-				printf("-v       Print version information\n");
-				printf("         ---DEBUGGING--\n");
-				printf("-s       Print structure information\n");
+				showusage();
 				return 0;
 				break;
 			case 'v':
@@ -388,4 +393,20 @@ int findnewestiss(iss ** issue, int no_of_issues)
 	}
 
 	return new_iss;
+}
+
+void showusage()
+{
+	printf("Usage: getht -u -a -d -m -n -f [-t tocfile] -h -v\n");
+	printf("-a | --download-all           Download all issues\n");
+	printf("-d | --download-latest        Download latest issue\n");
+	printf("-m | --download-all-media     Download all media\n");
+	printf("-n | --download-latest-media  Download latest issue's media\n");
+	printf("-f | --force                  Force redownloading of existent issues\n");
+	printf("-u | --update                 Update contents files\n");
+	printf("-t | --tocfile file           Use alternative contents xml file\n");
+	printf("-h | --help                   Print this help message\n");
+	printf("-v | --version                Print version information\n");
+	printf("         ---DEBUGGING--\n");
+	printf("-s                            Print structure information\n");
 }

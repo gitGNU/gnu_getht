@@ -8,7 +8,10 @@ post a screenshot?
 
 -immediate term-
 
-add long options
+if download fails, remove attempted file
+if -uf is passed, download & parse media regardless (check that same isn't added multiple times)
+
+handle ctrl-c by removing half-downloaded file
 
 save entered directories to config file
 
@@ -36,7 +39,7 @@ handle smil files successfully
 if no required contents file exists, attempt to retrieve it, even if update is not passed
 comment source - at least all functions
 
-use autotools
+#use autotools
 integrate gettext
 
 add options to allow decent listing of issues
