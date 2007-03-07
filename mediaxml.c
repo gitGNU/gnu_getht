@@ -132,7 +132,8 @@ iss ** parsemedia(char * filepath, iss ** issue, int * no_of_issues)
 	xmlDocPtr media_file;
 	xmlNodePtr node, itnode;
 
-	ready_xml(filepath, "media", &media_file, &node);
+	if(ready_xml(filepath, "media", &media_file, &node))
+		return NULL;
 
 	*node = *node->xmlChildrenNode;
 

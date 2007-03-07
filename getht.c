@@ -31,6 +31,10 @@
 #include "issue.h"
 #include "getht.h"
 
+int update_contents_files();
+
+med * findnewestmed(iss ** issue, int no_of_issues);
+
 void show_iss_struct(iss ** issue, int no_of_issues);
 void show_med_struct(med * issue);
 
@@ -38,8 +42,6 @@ void clearmed(med * cur_media);
 void cleariss(iss * cur_issue);
 
 void showusage();
-
-med * findnewestmed(iss ** issue, int no_of_issues);
 
 proxytype proxy_type; char proxy_addr[STR_MAX]; long proxy_port;
 proxyauth proxy_auth; 
@@ -73,6 +75,7 @@ int main(int argc, char *argv[])
 	int downallmedia = 0, downlatestmedia = 0;
 	int downissue = 0, downmedia = 0;
 	int force = 0, update = 0, showstr = 0;
+	int option = 0;
 
 	proxy_type = NONE;
 	proxy_port = 0;
@@ -105,39 +108,52 @@ int main(int argc, char *argv[])
 		{"force", no_argument, 0, 'f'},
 		{"update", no_argument, 0, 'u'},
 		{"tocfile", required_argument, 0, 't'},
+		{"mediatocfile", required_argument, 0, 'x'},
 		{"help", no_argument, 0, 'h'},
 		{"version", no_argument, 0, 'v'},
 		{0, 0, 0, 0}
 	};
-	while((c = getopt_long(argc, argv, "adfhmnsuvxt:", long_opts, NULL)) != -1) {
+	while((c = getopt_long(argc, argv, "adfhmnsuvx:t:", long_opts, NULL)) != -1) {
 		switch(c) {
 			case 'a':
 				downall = 1;
 				downissue = 1;
+				option = 1;
 				break;
 			case 'd':
 				downlatest = 1;
 				downissue = 1;
+				option = 1;
 				break;
 			case 'm':
 				downallmedia = 1;
 				downmedia = 1;
+				option = 1;
 				break;
 			case 'n':
 				downlatestmedia = 1;
 				downmedia = 1;
+				option = 1;
 				break;
 			case 'f':
 				force = 1;
+				option = 1;
 				break;
 			case 'u':
 				update = 1;
+				option = 1;
 				break;
 			case 's':
 				showstr = 1;
+				option = 1;
 				break;
 			case 't':
 				strcpy(issue_xml, strdup(optarg));
+				option = 1;
+				break;
+			case 'x':
+				strcpy(media_xml, strdup(optarg));
+				option = 1;
 				break;
 			case 'h':
 				showusage();
@@ -145,6 +161,7 @@ int main(int argc, char *argv[])
 				break;
 			case 'v':
 				printf("GetHT version: %s\n",VERSION);
+				option = 1;
 				return 0;
 				break;
 			default:
@@ -152,12 +169,18 @@ int main(int argc, char *argv[])
 		}
 	}
 
+	if(!option)
+	{
+		showusage();
+		return 0;
+	}
+
 	main_curl_handle = curl_easy_init();
 
 	if(update)
 	{
-		if(update_contents_files(NULL, NULL))
-			fprintf(stderr,"Could not update contents files");
+		if(update_contents_files())
+			fprintf(stderr,"Could not update contents files\n");
 	}
 
 	/* Parse TOC, filling issue structure */
@@ -170,6 +193,22 @@ int main(int argc, char *argv[])
 	if(downissue || showstr)
 	{
 		issue = parsetoc(issue_xml, &no_of_issues, &latest_index);
+
+		if(!issue)
+		{
+			if(!update)
+			{
+				printf("Cannot open contents file, trying to update contents\n");
+				if(update_contents_files())
+					return 1;
+				issue = parsetoc(issue_xml, &no_of_issues, &latest_index);
+			}
+			else
+			{
+				printf("Cannot open contents file, try running `getht --update`\n");
+				return 1;
+			}
+		}
 
 		if(showstr)
 			show_iss_struct(issue, no_of_issues);
@@ -197,6 +236,22 @@ int main(int argc, char *argv[])
 		int newest;
 
 		issue = parsemedia(media_xml, issue, &no_of_issues);
+
+		if(!issue)
+		{
+			if(!update)
+			{
+				printf("Cannot open media contents file, trying to update contents\n");
+				if(update_contents_files())
+					return 1;
+				issue = parsemedia(media_xml, issue, &no_of_issues);
+			}
+			else
+			{
+				printf("Cannot open contents file, try running `getht --update`\n");
+				return 1;
+			}
+		}
 
 		if(downlatestmedia)
 		{
@@ -228,25 +283,29 @@ int main(int argc, char *argv[])
 	return 0;
 }
 
-int update_contents_files(CURL *curl_handle, int temp)
+int update_contents_files()
 /* Returns 0 on success, 1 on failure */
 {
-	save_file(NULL, XML_TOC_URL, issue_xml);
+	if(save_file(NULL, XML_TOC_URL, issue_xml))
+		return 1;
 	
-	/*	see if current issue's media toc has already
-		been written to the xml, if not do so */
-
 	char isstitle[STR_MAX];
 	issdates date;
 
+	/*	see if current issue's media toc has already
+		been written to the xml, if not do so */
 	if(access(issue_xml, R_OK) == 0)
-		cur_identifiers(issue_xml, isstitle, &date);
+	{
+		if(cur_identifiers(issue_xml, isstitle, &date))
+			return 1;
+	}
 	else
 		return 1;
 
 	if(media_accounted_for(media_xml, &date))
 	{
-		save_file(curl_handle, MEDIA_TOC_URL, media_rev);
+		if(save_file(NULL, MEDIA_TOC_URL, media_rev))
+			return 1;
 	
 		med temp_med[MED_NO];
 	
@@ -257,7 +316,8 @@ int update_contents_files(CURL *curl_handle, int temp)
 		cur_identifiers(issue_xml, isstitle, &date);
 
 		int med_no = -1;
-		parsemediagz(media_rev, temp_med, &med_no);
+		if(parsemediagz(media_rev, temp_med, &med_no))
+			return 1;
 		/* BUG: this blanks title too... strange
 		 * Until we can find why, just get the title again */
 		cur_identifiers(issue_xml, isstitle, &date);
@@ -398,15 +458,14 @@ int findnewestiss(iss ** issue, int no_of_issues)
 void showusage()
 {
 	printf("Usage: getht -u -a -d -m -n -f [-t tocfile] -h -v\n");
+	printf("-u | --update                 Update contents files\n");
 	printf("-a | --download-all           Download all issues\n");
 	printf("-d | --download-latest        Download latest issue\n");
 	printf("-m | --download-all-media     Download all media\n");
 	printf("-n | --download-latest-media  Download latest issue's media\n");
-	printf("-f | --force                  Force redownloading of existent issues\n");
-	printf("-u | --update                 Update contents files\n");
+	printf("-f | --force                  Force re-download of existing files\n");
 	printf("-t | --tocfile file           Use alternative contents xml file\n");
+	printf("-x | --mediatocfile file      Use alternative media contents xml file\n");
 	printf("-h | --help                   Print this help message\n");
 	printf("-v | --version                Print version information\n");
-	printf("         ---DEBUGGING--\n");
-	printf("-s                            Print structure information\n");
 }

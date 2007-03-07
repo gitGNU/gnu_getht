@@ -44,7 +44,7 @@ extern char proxy_user[STR_MAX];
 extern char proxy_pass[STR_MAX];
 extern CURL *main_curl_handle;
 
-void save_file(CURL *curl_handle, char *url, char *filepath)
+int save_file(CURL *curl_handle, char *url, char *filepath)
 /*	Save the file *url to *filepath */
 {
 	printf("Downloading %s\n",url);
@@ -55,7 +55,10 @@ void save_file(CURL *curl_handle, char *url, char *filepath)
 	if(curl_handle) {
 		FILE *file;
 		if((file = fopen(filepath,"w")) == NULL)
+		{
 			fprintf(stderr,"Error: cannot open file %s for writing.\n",filepath);
+			return 1;
+		}
 
 		curl_easy_setopt(curl_handle, CURLOPT_URL, url);
 		curl_easy_setopt(curl_handle, CURLOPT_WRITEFUNCTION, write_func);
@@ -98,7 +101,11 @@ void save_file(CURL *curl_handle, char *url, char *filepath)
 		curl_easy_setopt(curl_handle, CURLOPT_PROGRESSFUNCTION, update_progress);
 
 		if(curl_easy_perform(curl_handle))
+		{
+			remove(filepath);
 			fprintf(stderr,"Error, could not download %s\n",url);
+			return 1;
+		}
 
 /*		double d;
 		curl_easy_getinfo(curl_handle, CURLINFO_SIZE_DOWNLOAD, &d);
@@ -117,7 +124,9 @@ void save_file(CURL *curl_handle, char *url, char *filepath)
 	else {
 		fprintf(stderr,"Error: curl failed to initialise.\n");
 		printf("Could not download %s\n",url);
+		return 1;
 	}
+	return 0;
 }
 
 int update_progress(void *data, double dltotal, double dlnow,

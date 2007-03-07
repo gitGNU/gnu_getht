@@ -77,6 +77,10 @@ int parsemediagz(char * media_path, med * cur_media, int * no_of_media)
 		}
 		strcpy(cur_line,""); /* reset cur_line */
 	}
+
+	if(*no_of_media == -1)
+		return 1;
+
 	return 0;
 }
 
