@@ -1,6 +1,6 @@
-The project is too small to warrent autoconf or anything else complex,
-so simply use the makefile provided to compile and install the software
-from source.
+At the moment this project uses a custom (but very basic) makefile
+to make and install. This will soon be changed to autotools, but at
+present this way works well enough.
 
 For a default install all that is needed is the following:
 
