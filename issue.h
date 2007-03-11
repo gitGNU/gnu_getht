@@ -64,7 +64,6 @@ typedef struct
 	char title[512];
 	int size;
 	issdates date;
-	sec cover;
 	sec section[SEC_NO];
 	int no_of_sections;
 	med media[MED_NO];

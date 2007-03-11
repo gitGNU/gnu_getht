@@ -342,13 +342,9 @@ void show_iss_struct(iss ** issue, int no_of_issues)
 		printf("Year:\t'%i'\n",issue[iss_no]->date.year);
 		printf("Number of Sections:\t'%i'\n",issue[iss_no]->no_of_sections);
 
-		printf("\t-Cover-\n");
-		printf("\tTitle:\t'%s'\n", issue[iss_no]->cover.title);
-		printf("\tURI:\t'%s'\n", issue[iss_no]->cover.uri);
-
-		for(sec_no=0; sec_no < (issue[iss_no]->no_of_sections); sec_no++)
+		for(sec_no=0; sec_no <= (issue[iss_no]->no_of_sections); sec_no++)
 		{
-			printf("\t-Section %i-\n", (sec_no+1));
+			printf("\t-Section %i-\n", (sec_no));
 			printf("\tTitle:\t'%s'\n", issue[iss_no]->section[sec_no].title);
 			printf("\tURI:\t'%s'\n", issue[iss_no]->section[sec_no].uri);
 			printf("\tNo. of Items:\t'%i'\n", issue[iss_no]->section[sec_no].no_of_items);
