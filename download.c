@@ -161,25 +161,10 @@ void downloadissue(CURL *curl_handle, char * directory, iss * issue, int force)
 			scanf("%s", newdir); /* TODO: incorporate tab-completion */
 		}
 
-	/* not reliable - workaround until malloc is completed */
-	if(!strncmp(issue->cover.uri, "http://www.", 11))
-	{
-		snprintf(filename,STR_MAX,"%s/cover.pdf", newdir);
-		if(!force){
-			testfile = fopen(filename, "r");
-			if(!testfile)
-				save_file(curl_handle, issue->cover.uri, filename);
-			else
-			{
-				fclose(testfile);
-				printf("Skipping download of cover\n");
-			}
-		}
-		else
-			save_file(curl_handle, issue->cover.uri, filename);
-	}
-
-	for(cur_section = issue->section; cur_section->number>0 && cur_section->number<=SEC_NO; cur_section++)
+	int count;
+	for(cur_section = issue->section, count = 0;
+			count <= issue->no_of_sections;
+			cur_section++, count++)
 	{
 		snprintf(filename,STR_MAX,"%s/section_%i.pdf", newdir, cur_section->number);
 		if(!force){

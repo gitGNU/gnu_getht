@@ -102,7 +102,7 @@ iss ** parsetoc(char *filepath, int * iss_no, int * latest)
 				cnode = cnode->next;
 			}
 		}
-	node = node->next;
+		node = node->next;
 	}
 
 	xmlFreeDoc(file);
@@ -128,12 +128,8 @@ int parseissue(xmlDocPtr file, xmlNodePtr node, iss * cur_issue, int * latest)
 	node = node->xmlChildrenNode;
 
 	while(node != NULL){
-		if(!xmlStrcmp(node->name, (const xmlChar *) "cover"))
-		{
-			cur_section = &(cur_issue->cover);
-			parsesection(file, node, cur_section);
-		}
-		else if(!xmlStrncmp(node->name, (char *) "section",7))
+		if(!xmlStrncmp(node->name, (char *) "section",7) ||
+			!xmlStrcmp(node->name, (const xmlChar *) "cover"))
 		{
 			no_of_sections++;
 			cur_section = &(cur_issue->section[no_of_sections]);
