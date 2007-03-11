@@ -164,8 +164,6 @@ int main(int argc, char *argv[])
 				option = 1;
 				return 0;
 				break;
-			default:
-				fprintf(stderr,"Unknown option: %c\n",c);
 		}
 	}
 
