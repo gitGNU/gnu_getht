@@ -5,7 +5,7 @@ LDFLAGS+=`curl-config --libs` `xml2-config --libs`
 
 all: getht
 
-getht: download.o config.o tocxml.o mediarev.o mediaxml.o xml.o
+getht: download.o config.o issuemem.o tocxml.o mediarev.o mediaxml.o xml.o
 
 tocxml.o mediaxml.o: xml.o
 

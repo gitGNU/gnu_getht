@@ -165,7 +165,7 @@ iss ** parsemedia(char * filepath, iss ** issue, int * no_of_issues)
 
 			if(!issue_there)
 			{	/* advance to the next free issue */
-				iss ** tmpiss;
+				iss ** tmpiss = NULL;
 				if(*no_of_issues == -1)
 				{	/* make issue** a new array of issue pointers */
 					if( (tmpiss = malloc(sizeof(iss *))) == NULL )
@@ -194,9 +194,11 @@ iss ** parsemedia(char * filepath, iss ** issue, int * no_of_issues)
 				tmp = *no_of_issues;
 			}
 
-			issue[tmp]->no_of_media = -1;
-			cur_media = issue[tmp]->media;
+			iss * cur_issue = issue[tmp];
 
+			issue[tmp]->no_of_media = -1;
+
+			med ** tmpmed = NULL;
 
 			itnode = node->xmlChildrenNode;
 
@@ -205,6 +207,31 @@ iss ** parsemedia(char * filepath, iss ** issue, int * no_of_issues)
 
 				if(!xmlStrcmp(itnode->name,(char *) "item"))
 				{
+					/* assign memory for new media */
+					if(cur_issue->no_of_media < 0)
+					{       /* make **section a new array of section pointers */
+						if( (tmpmed = malloc(sizeof(med *))) == NULL )
+						nogo_mem();
+					}
+					else
+					{       /* add a new pointer to media pointer list */
+						if( (tmpmed = realloc(cur_issue->media, sizeof(med *) + ((cur_issue->no_of_media+1) * sizeof(med *)))) == NULL )
+						nogo_mem();
+					}
+
+					cur_issue->no_of_media++;
+
+					/* make new array item a pointer to issue */
+					if( (tmpmed[cur_issue->no_of_media] = malloc(sizeof(med))) == NULL )
+						nogo_mem();
+
+					cur_issue->media = tmpmed;
+					/* memory for seoction all dealt with */
+
+					cur_media = cur_issue->media[cur_issue->no_of_media];
+					
+					clearmed(cur_media);
+
 					/* add media info to cur_media */
 					if(xmlGetProp(itnode, "uri"))
 						strncpy(cur_media->uri, (char *) xmlGetProp(itnode, "uri"), STR_MAX);
@@ -216,10 +243,6 @@ iss ** parsemedia(char * filepath, iss ** issue, int * no_of_issues)
 						strncpy(cur_media->preview_uri, (char *) xmlGetProp(itnode, "preview_uri"), STR_MAX);
 
 					strncpy(cur_media->title, (char *) xmlNodeListGetString(media_file, itnode->xmlChildrenNode, 1), STR_MAX);
-
-					issue[tmp]->no_of_media++;
-
-					cur_media++;
 				}
 				
 				itnode = itnode->next;

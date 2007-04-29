@@ -29,7 +29,6 @@
 #include "getht.h"
 
 iss ** parsetoc(char *filepath, int * iss_no, int * latest);
-iss ** parseyear(xmlDocPtr file, xmlNodePtr node, iss ** issue, int * latest);
 int parseissue(xmlDocPtr file, xmlNodePtr node, iss * cur_issue, int * latest);
 void parsesection(xmlDocPtr file, xmlNodePtr node, sec * cur_section);
 
@@ -37,17 +36,8 @@ void tokenise_hyphons(char to_token[10], int * first, int * last);
 
 int no_of_issues;
 
-void nogo_mem()
-/*	called if memory assignation fails
-	TODO: handle freeing of memory to avoid leaks */
-{
-	fprintf(stderr, "Could not assign memory, exitting\n");
-	exit(1);
-}
-
 iss ** parsetoc(char *filepath, int * iss_no, int * latest)
-/*	starts parsing of xml to issue structure
-	TODO: combine with parseyear */
+/*	starts parsing of xml to issue structure	*/
 {
 	xmlDocPtr file;
 	xmlNodePtr node;
@@ -59,10 +49,10 @@ iss ** parsetoc(char *filepath, int * iss_no, int * latest)
 
 	no_of_issues = -1;
 
-	iss ** issue;
+	iss ** issue = NULL;
+	//iss ** tmp = NULL;
 
 	int year;
-	iss ** tmp;
 
 	xmlNodePtr cnode;
 
@@ -75,29 +65,21 @@ iss ** parsetoc(char *filepath, int * iss_no, int * latest)
 			{
     				if(!xmlStrncmp(cnode->name,(char *) "issue",5))
 				{
-					if(no_of_issues < 0)
-					{	/* make issue** a new array of issue pointers */
-						if( (tmp = malloc(sizeof(iss *))) == NULL )
-							nogo_mem();
-					}
-					else
-					{	/* add a new pointer to issue pointer list */
-						if( (tmp = realloc(issue, sizeof(iss *) + ((no_of_issues+1) * sizeof(iss *)))) == NULL )
-							nogo_mem();
-					}
+					/* assign memory for the new issue */
+					issue = assignnew_iss(&no_of_issues, issue);
 
-					no_of_issues++;
+					/* setup issue globals */
+					issue[no_of_issues]->no_of_media = -1;
+					issue[no_of_issues]->no_of_sections = -1;
+					issue[no_of_issues]->date.year =
+						atoi( (const char *)(xmlStrsub(node->name,5,4)) );
+					tokenise_hyphons(
+							xmlStrsub(cnode->name,6,5),
+							&(issue[no_of_issues]->date.firstmonth),
+							&(issue[no_of_issues]->date.lastmonth));
 
-					/* make new array item a pointer to issue */
-					if( (tmp[no_of_issues] = malloc(sizeof(iss))) == NULL )
-						nogo_mem();
-
-					issue = tmp;
-
-					issue[no_of_issues]->no_of_media = -1; /* set default no of media */
-					issue[no_of_issues]->date.year = atoi( (const char *)(xmlStrsub(node->name,5,4)) );
-					tokenise_hyphons(xmlStrsub(cnode->name,6,5), &(issue[no_of_issues]->date.firstmonth), &(issue[no_of_issues]->date.lastmonth));
-					issue[no_of_issues]->no_of_sections = parseissue(file, cnode, issue[no_of_issues], latest);
+					/* parse the issue */
+					parseissue(file, cnode, issue[no_of_issues], latest);
 				}
 				cnode = cnode->next;
 			}
@@ -113,17 +95,13 @@ iss ** parsetoc(char *filepath, int * iss_no, int * latest)
 }
 
 int parseissue(xmlDocPtr file, xmlNodePtr node, iss * cur_issue, int * latest)
-/*	parses issue from xml, saving in cur_issue structure */
+/*	parses issue from xml, saving in cur_issue structure	*/
 {
-	int no_of_sections = -1;
-
 	strncpy(cur_issue->title, (char *) xmlGetProp(node, "title"), STR_MAX);
 	strncpy(cur_issue->preview_uri, (char *) xmlGetProp(node, "coverlink"), STR_MAX);
 
 	if(xmlGetProp(node, "current") && *latest==-1)
 		*latest = no_of_issues;
-
-	sec * cur_section = NULL;
 
 	node = node->xmlChildrenNode;
 
@@ -131,21 +109,26 @@ int parseissue(xmlDocPtr file, xmlNodePtr node, iss * cur_issue, int * latest)
 		if(!xmlStrncmp(node->name, (char *) "section",7) ||
 			!xmlStrcmp(node->name, (const xmlChar *) "cover"))
 		{
-			no_of_sections++;
-			cur_section = &(cur_issue->section[no_of_sections]);
+			/* assign memory for new section */
+			cur_issue->section = 
+				assignnew_sec(&(cur_issue->no_of_sections), cur_issue->section);
 
-			parsesection(file, node, cur_section);
+			/* setup section globals */
+			cur_issue->section[cur_issue->no_of_sections]->no_of_items = -1;
+
+			/* parse the section */
+			parsesection(file, node, cur_issue->section[cur_issue->no_of_sections]);
 		}
 		node = node->next;
 	}
 
-	return no_of_sections;
+	return 0;
 }
 
 void parsesection(xmlDocPtr file, xmlNodePtr node, sec * cur_section)
 /*	parses section xml, filling cur_section structure */
 {
-	it * cur_item;
+	it * cur_item = NULL;
 
 	strncpy(cur_section->uri, (char *) xmlGetProp(node, "pdflink"), STR_MAX);
 	strncpy(cur_section->title, (char *) xmlGetProp(node, "title"), STR_MAX);
@@ -155,31 +138,38 @@ void parsesection(xmlDocPtr file, xmlNodePtr node, sec * cur_section)
 	else
 		cur_section->number = atoi( (const char *)(xmlStrsub(node->name,8,1)) );
 
-	cur_item = cur_section->item;
-	cur_section->no_of_items = 0;
-
 	node = node->xmlChildrenNode;
 
 	char * pagenums;
+
+	it ** tmp = NULL;
 
 	while(node != NULL)
 	{
 		if(!xmlStrcmp(node->name, (const xmlChar *) "item"))
 		{
-			cur_section->no_of_items++;
-			cur_item->title = xmlNodeListGetString(file, node->xmlChildrenNode, 1);
-			if(pagenums = (char *) xmlGetProp(node, "pages"))
-				tokenise_hyphons(pagenums, &(cur_item->firstpage), &(cur_item->lastpage));
-			else
+			if(xmlNodeListGetString(file, node->xmlChildrenNode, 1) != NULL)
+			/* ignore items without titles */
 			{
-				cur_item->firstpage = 0;
-				cur_item->lastpage = 0;
+				/* assign memory for new item */
+				cur_section->item =
+					assignnew_it( &(cur_section->no_of_items), cur_section->item);
+
+				cur_item = cur_section->item[cur_section->no_of_items];
+
+				/* parse item */
+				cur_item->title = xmlNodeListGetString(file, node->xmlChildrenNode, 1);
+				if(pagenums = (char *) xmlGetProp(node, "pages"))
+					tokenise_hyphons(pagenums, &(cur_item->firstpage), &(cur_item->lastpage));
+				else
+				{
+					cur_item->firstpage = 0;
+					cur_item->lastpage = 0;
+				}
 			}
-			cur_item++;
 		}
 	node = node->next;	
 	}
-	cur_item = 0;
 }
 
 void tokenise_hyphons(char to_token[10], int * first, int * last)

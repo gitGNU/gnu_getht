@@ -208,9 +208,6 @@ int main(int argc, char *argv[])
 			}
 		}
 
-		if(showstr)
-			show_iss_struct(issue, no_of_issues);
-
 		if(latest_index == -1)
 		{
 			fprintf(stderr, "Error: Cannot ascertain latest issue. ");
@@ -228,9 +225,8 @@ int main(int argc, char *argv[])
 			downloadissue(NULL, save_path, issue[latest_index], force);
 	}
 	
-	if(downmedia)
+	if(downmedia || showstr)
 	{
-		med * cur_media;
 		int newest;
 
 		issue = parsemedia(media_xml, issue, &no_of_issues);
@@ -255,7 +251,7 @@ int main(int argc, char *argv[])
 		{
 			newest = findnewestiss(issue, no_of_issues);
 			for(i = 0; i <= issue[newest]->no_of_media; i++)
-				downloadmedia(NULL, save_path, &(issue[newest]->media[i]), force);
+				downloadmedia(NULL, save_path, issue[newest]->media[i], force);
 		}
 
 		if(downallmedia)
@@ -263,17 +259,13 @@ int main(int argc, char *argv[])
 			for(i = 0; i <= no_of_issues; i++)
 			{
 				for(newest = 0; newest <= issue[i]->no_of_media; newest++)
-					downloadmedia(NULL, save_path, &(issue[i]->media[newest]), force);
+					downloadmedia(NULL, save_path, issue[i]->media[newest], force);
 			}
 		}
 	}
 
-	if(no_of_issues > -1)
-	{
-		for(i = 0; i < no_of_issues; i++)
-			free(issue[i]);
-		free(issue);
-	}
+	if(showstr)
+		show_iss_struct(issue, no_of_issues);
 
 	/* Ensure curl cleans itself up */
 	curl_easy_cleanup(main_curl_handle);
@@ -331,7 +323,7 @@ int update_contents_files()
 void show_iss_struct(iss ** issue, int no_of_issues)
 /*	Prints issue information */
 {
-	int iss_no, sec_no, it_no;
+	int iss_no, sec_no, med_no, it_no;
 	printf("%i Issues\n",no_of_issues);
 	for(iss_no=0;iss_no<no_of_issues;iss_no++)
 	{
@@ -345,20 +337,32 @@ void show_iss_struct(iss ** issue, int no_of_issues)
 		for(sec_no=0; sec_no <= (issue[iss_no]->no_of_sections); sec_no++)
 		{
 			printf("\t-Section %i-\n", (sec_no));
-			printf("\tTitle:\t'%s'\n", issue[iss_no]->section[sec_no].title);
-			printf("\tURI:\t'%s'\n", issue[iss_no]->section[sec_no].uri);
-			printf("\tNo. of Items:\t'%i'\n", issue[iss_no]->section[sec_no].no_of_items);
+			printf("\tTitle:\t'%s'\n", issue[iss_no]->section[sec_no]->title);
+			printf("\tURI:\t'%s'\n", issue[iss_no]->section[sec_no]->uri);
+			printf("\tNo. of Items:\t'%i'\n", issue[iss_no]->section[sec_no]->no_of_items);
 
-			for(it_no=0; it_no < issue[iss_no]->section[sec_no].no_of_items; it_no++)
+			for(it_no=0; it_no <= issue[iss_no]->section[sec_no]->no_of_items; it_no++)
 			{
 				printf("\t\t-Item-\n");
-				printf("\t\tTitle:\t'%s'\n",issue[iss_no]->section[sec_no].item[it_no].title);
-				printf("\t\tFirst page:\t'%i'",issue[iss_no]->section[sec_no].item[it_no].firstpage);
-				printf("\tLast page:\t'%i'\n",issue[iss_no]->section[sec_no].item[it_no].lastpage);
+				printf("\t\tTitle:\t'%s'\n",issue[iss_no]->section[sec_no]->item[it_no]->title);
+				printf("\t\tFirst page:\t'%i'",issue[iss_no]->section[sec_no]->item[it_no]->firstpage);
+				printf("\tLast page:\t'%i'\n",issue[iss_no]->section[sec_no]->item[it_no]->lastpage);
 			}
 			it_no = 0;
 		}
 		sec_no = 0;
+
+		printf("Number of Media:\t'%i'\n",issue[iss_no]->no_of_media);
+
+		for(med_no=0; med_no <= (issue[iss_no]->no_of_media); med_no++)
+		{
+			printf("\t-Media %i-\n", (med_no));
+			printf("\tTitle:\t'%s'\n", issue[iss_no]->media[med_no]->title);
+			printf("\tURI:\t'%s'\n", issue[iss_no]->media[med_no]->uri);
+			printf("\tComment:\t'%s'\n", issue[iss_no]->media[med_no]->comment);
+			printf("\tPreview URI:\t'%s'\n", issue[iss_no]->media[med_no]->preview_uri);
+		}
+		med_no = 0;
 	}
 }
 
@@ -389,24 +393,22 @@ void cleariss(iss * cur_issue)
 		cur_issue->preview_uri[0] = '\0';
 		cur_issue->title[0] = '\0';
 		cur_issue->size = 0;
-		cur_issue->no_of_sections = 0;
-		cur_issue->no_of_media = 0;
-		clearmed(cur_issue->media);
+		cur_issue->no_of_sections = -1;
+		cur_issue->section = NULL;
+		cur_issue->no_of_media = -1;
+		cur_issue->media = NULL;
+		//clearmed(cur_issue->media);
 	}
 }
 
 void clearmed(med * cur_media)
-/*	clears all members of media arrays */
+/*	clears the members of a media array */
 {
-	int tmp;
-	for(tmp=0; tmp<=MED_NO; cur_media++,tmp++)
-	{
-		cur_media->uri[0] = '\0';
-		cur_media->title[0] = '\0';
-		cur_media->comment[0] = '\0';
-		cur_media->preview_uri[0] = '\0';
-		cur_media->size = 0;
-	}
+	cur_media->uri[0] = '\0';
+	cur_media->title[0] = '\0';
+	cur_media->comment[0] = '\0';
+	cur_media->preview_uri[0] = '\0';
+	cur_media->size = 0;
 }
 
 void clearsec(sec * cur_section)

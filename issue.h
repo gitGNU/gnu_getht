@@ -45,7 +45,7 @@ typedef struct
 	char title[512];
 	int number;
 	int size;
-	it item[ITEM_NO];
+	it ** item;
 	int no_of_items;
 } sec;
 
@@ -64,8 +64,15 @@ typedef struct
 	char title[512];
 	int size;
 	issdates date;
-	sec section[SEC_NO];
+	sec ** section;
 	int no_of_sections;
-	med media[MED_NO];
+	med ** media;
 	int no_of_media;
 } iss;
+
+iss ** parsetoc(char *filepath, int * iss_no, int * latest);
+iss ** parsemedia(char * filepath, iss ** issue, int * no_of_issues);
+
+iss ** assignnew_iss(int *no_of_issues, iss ** issue);
+sec ** assignnew_sec(int *no_of_sections, sec ** section);
+it ** assignnew_it(int * no_of_items, it ** item);

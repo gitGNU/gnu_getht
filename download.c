@@ -162,10 +162,10 @@ void downloadissue(CURL *curl_handle, char * directory, iss * issue, int force)
 		}
 
 	int count;
-	for(cur_section = issue->section, count = 0;
-			count <= issue->no_of_sections;
-			cur_section++, count++)
+	for(count = 0; count <= issue->no_of_sections; count++)
 	{
+		cur_section = issue->section[count];
+
 		snprintf(filename,STR_MAX,"%s/section_%i.pdf", newdir, cur_section->number);
 		if(!force){
 			testfile = fopen(filename, "r");
