@@ -36,10 +36,6 @@ int update_contents_files();
 med * findnewestmed(iss ** issue, int no_of_issues);
 
 void show_iss_struct(iss ** issue, int no_of_issues);
-void show_med_struct(med * issue);
-
-void clearmed(med * cur_media);
-void cleariss(iss * cur_issue);
 
 void showusage();
 
@@ -297,20 +293,10 @@ int update_contents_files()
 		if(save_file(NULL, MEDIA_TOC_URL, media_rev))
 			return 1;
 	
-		med temp_med[MED_NO];
-	
-		clearmed(temp_med);
-		/* BUG: for no good reason, this resets title[] too...
-		 * Until we can find why, just get the title again */
-
-		cur_identifiers(issue_xml, isstitle, &date);
-
+		med ** temp_med;
 		int med_no = -1;
-		if(parsemediagz(media_rev, temp_med, &med_no))
-			return 1;
-		/* BUG: this blanks title too... strange
-		 * Until we can find why, just get the title again */
-		cur_identifiers(issue_xml, isstitle, &date);
+
+		temp_med = parsemediagz(media_rev, &med_no);
 
 		unlink(media_rev);
 
@@ -325,7 +311,7 @@ void show_iss_struct(iss ** issue, int no_of_issues)
 {
 	int iss_no, sec_no, med_no, it_no;
 	printf("%i Issues\n",no_of_issues);
-	for(iss_no=0;iss_no<no_of_issues;iss_no++)
+	for(iss_no=0;iss_no<=no_of_issues;iss_no++)
 	{
 		printf("-Issue %i-\n", (iss_no+1));
 		printf("Title:\t'%s'\n", issue[iss_no]->title);
@@ -363,65 +349,6 @@ void show_iss_struct(iss ** issue, int no_of_issues)
 			printf("\tPreview URI:\t'%s'\n", issue[iss_no]->media[med_no]->preview_uri);
 		}
 		med_no = 0;
-	}
-}
-
-void show_med_struct(med * cur_media)
-/*	Prints media information */
-{
-	int tmp;
-	for(tmp=0;tmp<MED_NO;cur_media++,tmp++)
-	{
-		printf("--Media item--\n");
-
-		printf("uri: '%s'\n", cur_media->uri);
-		printf("title: '%s'\n", cur_media->title);
-		printf("comment: '%s'\n", cur_media->comment);
-		printf("preview_uri: '%s'\n", cur_media->preview_uri);
-		printf("size: '%i'\n", cur_media->size);
-
-		printf("\n");
-	}
-}
-
-void cleariss(iss * cur_issue)
-/*	turns off exist flags for all issue structures */
-{
-	int tmp;
-	for(tmp=0; tmp<MAX_ISS; cur_issue++,tmp++)
-	{
-		cur_issue->preview_uri[0] = '\0';
-		cur_issue->title[0] = '\0';
-		cur_issue->size = 0;
-		cur_issue->no_of_sections = -1;
-		cur_issue->section = NULL;
-		cur_issue->no_of_media = -1;
-		cur_issue->media = NULL;
-		//clearmed(cur_issue->media);
-	}
-}
-
-void clearmed(med * cur_media)
-/*	clears the members of a media array */
-{
-	cur_media->uri[0] = '\0';
-	cur_media->title[0] = '\0';
-	cur_media->comment[0] = '\0';
-	cur_media->preview_uri[0] = '\0';
-	cur_media->size = 0;
-}
-
-void clearsec(sec * cur_section)
-/*	clears all members of section arrays */
-{
-	int tmp;
-	for(tmp=0; tmp<=SEC_NO; cur_section++,tmp++)
-	{
-		cur_section->uri[0] = '\0';
-		cur_section->title[0] = '\0';
-		cur_section->size = 0;
-		cur_section->number = 0;
-		cur_section->no_of_items = 0;
 	}
 }
 

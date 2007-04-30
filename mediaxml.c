@@ -66,7 +66,7 @@ int media_accounted_for(char * filepath, issdates * date)
 	return found;
 }
 
-int addmediaissue(char * filepath, char * title, issdates * date, med * media, int med_no)
+int addmediaissue(char * filepath, char * title, issdates * date, med ** media, int med_no)
 /*	Appends data from media structures to xml file. */
 {
 	xmlDocPtr media_file;
@@ -99,17 +99,18 @@ int addmediaissue(char * filepath, char * title, issdates * date, med * media, i
 	xmlNewProp(curissue, "lastmonth", tmp);
 
 	xmlNodePtr curitem;
-	int i;
-	for(i = 0; i <= med_no; i++)
+
+	int count;
+	for(count = 0; count <= med_no; count++)
 	{
-		curitem = xmlNewTextChild(curissue, NULL, "item", media[i].title);
+		curitem = xmlNewTextChild(curissue, NULL, "item", media[count]->title);
 
-		xmlNewProp(curitem, "uri", media[i].uri);
+		xmlNewProp(curitem, "uri", media[count]->uri);
 
-		if(media[i].comment)
-			xmlNewProp(curitem, "comment", media[i].comment);
-		if(media[i].preview_uri)
-			xmlNewProp(curitem, "preview_uri", media[i].preview_uri);
+		if(media[count]->comment)
+			xmlNewProp(curitem, "comment", media[count]->comment);
+		if(media[count]->preview_uri)
+			xmlNewProp(curitem, "preview_uri", media[count]->preview_uri);
 	}
 
 	xmlKeepBlanksDefault(0);
@@ -198,8 +199,6 @@ iss ** parsemedia(char * filepath, iss ** issue, int * no_of_issues)
 
 			issue[tmp]->no_of_media = -1;
 
-			med ** tmpmed = NULL;
-
 			itnode = node->xmlChildrenNode;
 
 			while (itnode != NULL)
@@ -207,30 +206,17 @@ iss ** parsemedia(char * filepath, iss ** issue, int * no_of_issues)
 
 				if(!xmlStrcmp(itnode->name,(char *) "item"))
 				{
-					/* assign memory for new media */
-					if(cur_issue->no_of_media < 0)
-					{       /* make **section a new array of section pointers */
-						if( (tmpmed = malloc(sizeof(med *))) == NULL )
-						nogo_mem();
-					}
-					else
-					{       /* add a new pointer to media pointer list */
-						if( (tmpmed = realloc(cur_issue->media, sizeof(med *) + ((cur_issue->no_of_media+1) * sizeof(med *)))) == NULL )
-						nogo_mem();
-					}
+					/* assign memory for the new media */
+					cur_issue->media = assignnew_med(cur_issue->media, &(cur_issue->no_of_media));
 
-					cur_issue->no_of_media++;
-
-					/* make new array item a pointer to issue */
-					if( (tmpmed[cur_issue->no_of_media] = malloc(sizeof(med))) == NULL )
-						nogo_mem();
-
-					cur_issue->media = tmpmed;
-					/* memory for seoction all dealt with */
-
+					/* setup media globals */
 					cur_media = cur_issue->media[cur_issue->no_of_media];
 					
-					clearmed(cur_media);
+					cur_media->uri[0] = '\0';
+					cur_media->title[0] = '\0';
+					cur_media->comment[0] = '\0';
+					cur_media->preview_uri[0] = '\0';
+					cur_media->size = 0;
 
 					/* add media info to cur_media */
 					if(xmlGetProp(itnode, "uri"))
@@ -253,6 +239,8 @@ iss ** parsemedia(char * filepath, iss ** issue, int * no_of_issues)
 	}
 
 	xmlFreeDoc(media_file);
+
+	issuesort(issue, no_of_issues);
 
 	return issue;
 }

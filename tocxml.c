@@ -50,7 +50,6 @@ iss ** parsetoc(char *filepath, int * iss_no, int * latest)
 	no_of_issues = -1;
 
 	iss ** issue = NULL;
-	//iss ** tmp = NULL;
 
 	int year;
 
@@ -66,7 +65,7 @@ iss ** parsetoc(char *filepath, int * iss_no, int * latest)
     				if(!xmlStrncmp(cnode->name,(char *) "issue",5))
 				{
 					/* assign memory for the new issue */
-					issue = assignnew_iss(&no_of_issues, issue);
+					issue = assignnew_iss(issue, &no_of_issues);
 
 					/* setup issue globals */
 					issue[no_of_issues]->no_of_media = -1;
@@ -91,6 +90,8 @@ iss ** parsetoc(char *filepath, int * iss_no, int * latest)
 
 	*iss_no = no_of_issues;
 
+	issuesort(issue, no_of_issues);
+
 	return issue;
 }
 
@@ -111,7 +112,7 @@ int parseissue(xmlDocPtr file, xmlNodePtr node, iss * cur_issue, int * latest)
 		{
 			/* assign memory for new section */
 			cur_issue->section = 
-				assignnew_sec(&(cur_issue->no_of_sections), cur_issue->section);
+				assignnew_sec(cur_issue->section, &(cur_issue->no_of_sections));
 
 			/* setup section globals */
 			cur_issue->section[cur_issue->no_of_sections]->no_of_items = -1;
@@ -153,7 +154,7 @@ void parsesection(xmlDocPtr file, xmlNodePtr node, sec * cur_section)
 			{
 				/* assign memory for new item */
 				cur_section->item =
-					assignnew_it( &(cur_section->no_of_items), cur_section->item);
+					assignnew_it( cur_section->item, &(cur_section->no_of_items));
 
 				cur_item = cur_section->item[cur_section->no_of_items];
 

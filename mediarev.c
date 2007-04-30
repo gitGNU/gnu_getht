@@ -30,16 +30,20 @@ int smilurl(char * smilurl, med * cur_media);
 void getquote(char * input, char * label);
 void removeleadingspace(char * cur_line);
 
-int parsemediagz(char * media_path, med * cur_media, int * no_of_media)
+med ** parsemediagz(char * media_path, int * no_of_media)
 /*	Parses gzipped adobe pagemaker files for media urls and metadata,
- *	filling cur_media with the information. */
+ *	filling media with the information. */
 {
 	char cur_line[STR_MAX];
 	gzFile mediagz;
 
+	med ** media = NULL;
+
 	strcpy(cur_line,""); /* reset cur_line */
 
 	mediagz = gzopen(media_path, "r");
+
+	med * cur_media;
 
 	while(gzeof(mediagz)==0)
 	{
@@ -49,6 +53,20 @@ int parsemediagz(char * media_path, med * cur_media, int * no_of_media)
 		if(!strcmp(cur_line,"on mouseUp"))
 		{
 			strcpy(cur_line,""); /* reset cur_line */
+
+			/* assign memory for the new media */
+			media = assignnew_med(media, no_of_media);
+
+			cur_media = media[*no_of_media];
+
+			/* setup media globals */
+			cur_media->uri[0] = '\0';
+			cur_media->title[0] = '\0';
+			cur_media->comment[0] = '\0';
+			cur_media->preview_uri[0] = '\0';
+			cur_media->size = 0;
+
+			/* process rev file */
 			while(strcmp(cur_line,"end mouseUp") && gzeof(mediagz)==0)
 			{
 				strcpy(cur_line,""); /* reset cur_line */
@@ -72,16 +90,11 @@ int parsemediagz(char * media_path, med * cur_media, int * no_of_media)
 					getquote(cur_line,cur_media->comment);
 				}
 			}
-			*cur_media++;
-			(*no_of_media)++;
 		}
 		strcpy(cur_line,""); /* reset cur_line */
 	}
 
-	if(*no_of_media == -1)
-		return 1;
-
-	return 0;
+	return media;
 }
 
 int smilurl(char * smilurl, med * cur_media)

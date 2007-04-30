@@ -19,10 +19,6 @@
  *
  */
 
-#define	SEC_NO	5
-#define	ITEM_NO	30
-#define	MED_NO	2
-
 /* all sizes are in bytes and are child-inclusive */
 
 typedef struct
@@ -73,6 +69,9 @@ typedef struct
 iss ** parsetoc(char *filepath, int * iss_no, int * latest);
 iss ** parsemedia(char * filepath, iss ** issue, int * no_of_issues);
 
-iss ** assignnew_iss(int *no_of_issues, iss ** issue);
-sec ** assignnew_sec(int *no_of_sections, sec ** section);
-it ** assignnew_it(int * no_of_items, it ** item);
+med ** parsemediagz(char * media_path, int * no_of_media);
+
+iss ** assignnew_iss(iss ** issue, int *no_of_issues);
+sec ** assignnew_sec(sec ** section, int * no_of_sections);
+it ** assignnew_it(it ** item, int * no_of_items);
+med ** assignnew_med(med ** media, int * no_of_media);
