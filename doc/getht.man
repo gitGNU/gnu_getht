@@ -27,7 +27,7 @@
 .SH SYNOPSIS
 .TP 5
 \fBgetht
-\fI[-uadmnfvh] [-t tocfile] [-m medtocfile]\fR
+\fI[-ualmofVvh] [-d issno] [-n medno] [-t tocfile] [-m medtocfile]\fR
 
 .SH DESCRIPTION
 .PP
@@ -47,21 +47,30 @@ Update the Hinduism Today contents files.
 .B \-a, \-\-download-all
 Download all issues of Hinduism Today. 
 .TP
-.B \-d, \-\-download-latest
-Download only the latest issue of Hinduism Today.
+.B \-d, \-\-download-issue issno
+Download the issue numbered issno (use \fI-l\fR to find
+issue numbers).
+.TP
+.B \-n, \-\-download-media medno
+Download the multimedia file numbered medno (use \fI-m\fR
+to find media numbers).
 .TP
 .B \-m, \-\-download-all-media
 Download all multimedia files distributed by Hinduism 
 Today.
 .TP
-.B \-n, \-\-download-latest-media
-Download only the multimedia files from the latest 
-issue of Hinduism Today.
-.TP
 .B \-f, \-\-force
 Force getht to download files, even if they have
 already been downloaded. This is useful if a download
 has been corrupted or interrupted.
+.TP
+.B \-l, \-\-list-issues
+List the issues of Hinduism Today, with issue numbers,
+sorted by date.
+.TP
+.B \m, \-\-list-media
+List the multimedia files associated with Hinduism 
+today, with media numbers, sorted by issue date.
 .TP
 .B \-t, \-\-tocfile tocfile
 Use a different contents file, as specified by tocfile.
@@ -73,7 +82,11 @@ mediatocfile.
 .B \-h, \-\-help
 Print a brief usage message.
 .TP
-.B \-v, \-\-version
+.B \-v, \-\-verbose
+Make the output from \fI-l\fR and \fI-m\fR more verbose.
+May be used twice to make output yet more verbose.
+.TP
+.B \-V, \-\-version
 Display the version number.
 
 .SH CONFIGURATION FILE

@@ -66,7 +66,7 @@ typedef struct
 	int no_of_media;
 } iss;
 
-iss ** parsetoc(char *filepath, int * iss_no, int * latest);
+iss ** parsetoc(char *filepath, int * iss_no);
 iss ** parsemedia(char * filepath, iss ** issue, int * no_of_issues);
 
 med ** parsemediagz(char * media_path, int * no_of_media);

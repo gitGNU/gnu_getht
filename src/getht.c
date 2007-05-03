@@ -35,10 +35,6 @@ int update_contents_files();
 
 med * findnewestmed(iss ** issue, int no_of_issues);
 
-void show_iss_struct(iss ** issue, int no_of_issues);
-
-void showusage();
-
 proxytype proxy_type; char proxy_addr[STR_MAX]; long proxy_port;
 proxyauth proxy_auth; 
 char proxy_user[STR_MAX]; char proxy_pass[STR_MAX];
@@ -67,11 +63,12 @@ int main(int argc, char *argv[])
 
 	snprintf(save_path,STR_MAX,"%s/hinduism_today",getenv("HOME"));
 
-	int downall = 0, downlatest = 0;
-	int downallmedia = 0, downlatestmedia = 0;
-	int downissue = 0, downmedia = 0;
-	int force = 0, update = 0, showstr = 0;
-	int option = 0;
+	int downall = 0, downallmedia = 0;
+	int downissue = 0, downissueno = -1;
+	int downmedia = 0, downmediano = -1;
+	int listissues = 0, listmedia = 0;
+	int force = 0, update = 0;
+	int verbose = 0, option = 0;
 
 	proxy_type = NONE;
 	proxy_port = 0;
@@ -98,18 +95,21 @@ int main(int argc, char *argv[])
 	static struct option long_opts[] =
 	{
 		{"download-all", no_argument, 0, 'a'},
-		{"download-latest", no_argument, 0, 'd'},
-		{"download-all-media", no_argument, 0, 'm'},
-		{"download-latest-media", no_argument, 0, 'n'},
+		{"download-issue", required_argument, 0, 'd'},
+		{"download-media", required_argument, 0, 'n'},
+		{"download-all-media", no_argument, 0, 'o'},
 		{"force", no_argument, 0, 'f'},
+		{"list-issues", no_argument, 0, 'l'},
+		{"list-media", no_argument, 0, 'm'},
 		{"update", no_argument, 0, 'u'},
 		{"tocfile", required_argument, 0, 't'},
 		{"mediatocfile", required_argument, 0, 'x'},
 		{"help", no_argument, 0, 'h'},
-		{"version", no_argument, 0, 'v'},
+		{"verbose", no_argument, 0, 'v'},
+		{"version", no_argument, 0, 'V'},
 		{0, 0, 0, 0}
 	};
-	while((c = getopt_long(argc, argv, "adfhmnsuvx:t:", long_opts, NULL)) != -1) {
+	while((c = getopt_long(argc, argv, "ad:fhlmn:osuvVx:t:", long_opts, NULL)) != -1) {
 		switch(c) {
 			case 'a':
 				downall = 1;
@@ -117,18 +117,26 @@ int main(int argc, char *argv[])
 				option = 1;
 				break;
 			case 'd':
-				downlatest = 1;
 				downissue = 1;
+				downissueno = atoi(optarg);
+				option = 1;
+				break;
+			case 'l':
+				listissues = 1;
 				option = 1;
 				break;
 			case 'm':
+				listmedia = 1;
+				option = 1;
+				break;
+			case 'o':
 				downallmedia = 1;
 				downmedia = 1;
 				option = 1;
 				break;
 			case 'n':
-				downlatestmedia = 1;
 				downmedia = 1;
+				downmediano = atoi(optarg);
 				option = 1;
 				break;
 			case 'f':
@@ -137,10 +145,6 @@ int main(int argc, char *argv[])
 				break;
 			case 'u':
 				update = 1;
-				option = 1;
-				break;
-			case 's':
-				showstr = 1;
 				option = 1;
 				break;
 			case 't':
@@ -156,6 +160,10 @@ int main(int argc, char *argv[])
 				return 0;
 				break;
 			case 'v':
+				verbose++;
+				option = 1;
+				break;
+			case 'V':
 				printf("GetHT version: %s\n",VERSION);
 				option = 1;
 				return 0;
@@ -181,12 +189,11 @@ int main(int argc, char *argv[])
 
 	iss **issue;
 	int no_of_issues = -1;
-	int latest_index = -1;
 	int i;
 
-	if(downissue || showstr)
+	if(downissue || listissues)
 	{
-		issue = parsetoc(issue_xml, &no_of_issues, &latest_index);
+		issue = parsetoc(issue_xml, &no_of_issues);
 
 		if(!issue)
 		{
@@ -195,7 +202,7 @@ int main(int argc, char *argv[])
 				printf("Cannot open contents file, trying to update contents\n");
 				if(update_contents_files())
 					return 1;
-				issue = parsetoc(issue_xml, &no_of_issues, &latest_index);
+				issue = parsetoc(issue_xml, &no_of_issues);
 			}
 			else
 			{
@@ -204,24 +211,16 @@ int main(int argc, char *argv[])
 			}
 		}
 
-		if(latest_index == -1)
-		{
-			fprintf(stderr, "Error: Cannot ascertain latest issue. ");
-			fprintf(stderr, "Defaulting to first issue in contents file\n");
-			latest_index = 0;
-		}
-
 		if(downall)
 		{
 			for(i = 0; i < no_of_issues; i++)
 				downloadissue(NULL, save_path, issue[i], force);
 		}
-	
-		if(downlatest)
-			downloadissue(NULL, save_path, issue[latest_index], force);
+		else if(downissueno >= 0 && downissueno <= no_of_issues)
+			downloadissue(NULL, save_path, issue[downissueno], force);
 	}
 	
-	if(downmedia || showstr)
+	if(downmedia || listmedia)
 	{
 		int newest;
 
@@ -243,13 +242,6 @@ int main(int argc, char *argv[])
 			}
 		}
 
-		if(downlatestmedia)
-		{
-			newest = findnewestiss(issue, no_of_issues);
-			for(i = 0; i <= issue[newest]->no_of_media; i++)
-				downloadmedia(NULL, save_path, issue[newest]->media[i], force);
-		}
-
 		if(downallmedia)
 		{
 			for(i = 0; i <= no_of_issues; i++)
@@ -258,10 +250,23 @@ int main(int argc, char *argv[])
 					downloadmedia(NULL, save_path, issue[i]->media[newest], force);
 			}
 		}
+		else if(downmediano >= 0)
+		{
+			int med_global, med_no;
+
+			for(i=0,med_global=0; i<=no_of_issues; i++)
+				if(issue[i]->no_of_media >= 0)
+					for(med_no=0; med_no <= (issue[i]->no_of_media); med_no++,med_global++)
+						if(med_global == downmediano)
+							downloadmedia(NULL, save_path, issue[i]->media[med_no], force);
+		}
 	}
 
-	if(showstr)
-		show_iss_struct(issue, no_of_issues);
+	if(listissues)
+		list_issues(issue, no_of_issues, verbose);
+
+	if(listmedia)
+		list_media(issue, no_of_issues, verbose);
 
 	/* Ensure curl cleans itself up */
 	curl_easy_cleanup(main_curl_handle);
@@ -306,52 +311,6 @@ int update_contents_files()
 	return 0;
 }
 
-void show_iss_struct(iss ** issue, int no_of_issues)
-/*	Prints issue information */
-{
-	int iss_no, sec_no, med_no, it_no;
-	printf("%i Issues\n",no_of_issues);
-	for(iss_no=0;iss_no<=no_of_issues;iss_no++)
-	{
-		printf("-Issue %i-\n", (iss_no+1));
-		printf("Title:\t'%s'\n", issue[iss_no]->title);
-		printf("Preview URI:\t'%s'\n", issue[iss_no]->preview_uri);
-		printf("Months:\t'%i' - '%i'\n",issue[iss_no]->date.firstmonth,issue[iss_no]->date.lastmonth);
-		printf("Year:\t'%i'\n",issue[iss_no]->date.year);
-		printf("Number of Sections:\t'%i'\n",issue[iss_no]->no_of_sections);
-
-		for(sec_no=0; sec_no <= (issue[iss_no]->no_of_sections); sec_no++)
-		{
-			printf("\t-Section %i-\n", (sec_no));
-			printf("\tTitle:\t'%s'\n", issue[iss_no]->section[sec_no]->title);
-			printf("\tURI:\t'%s'\n", issue[iss_no]->section[sec_no]->uri);
-			printf("\tNo. of Items:\t'%i'\n", issue[iss_no]->section[sec_no]->no_of_items);
-
-			for(it_no=0; it_no <= issue[iss_no]->section[sec_no]->no_of_items; it_no++)
-			{
-				printf("\t\t-Item-\n");
-				printf("\t\tTitle:\t'%s'\n",issue[iss_no]->section[sec_no]->item[it_no]->title);
-				printf("\t\tFirst page:\t'%i'",issue[iss_no]->section[sec_no]->item[it_no]->firstpage);
-				printf("\tLast page:\t'%i'\n",issue[iss_no]->section[sec_no]->item[it_no]->lastpage);
-			}
-			it_no = 0;
-		}
-		sec_no = 0;
-
-		printf("Number of Media:\t'%i'\n",issue[iss_no]->no_of_media);
-
-		for(med_no=0; med_no <= (issue[iss_no]->no_of_media); med_no++)
-		{
-			printf("\t-Media %i-\n", (med_no));
-			printf("\tTitle:\t'%s'\n", issue[iss_no]->media[med_no]->title);
-			printf("\tURI:\t'%s'\n", issue[iss_no]->media[med_no]->uri);
-			printf("\tComment:\t'%s'\n", issue[iss_no]->media[med_no]->comment);
-			printf("\tPreview URI:\t'%s'\n", issue[iss_no]->media[med_no]->preview_uri);
-		}
-		med_no = 0;
-	}
-}
-
 int findnewestiss(iss ** issue, int no_of_issues)
 /*	returns newest issue indice */
 {
@@ -376,19 +335,4 @@ int findnewestiss(iss ** issue, int no_of_issues)
 	}
 
 	return new_iss;
-}
-
-void showusage()
-{
-	printf("Usage: getht -u -a -d -m -n -f [-t tocfile] -h -v\n");
-	printf("-u | --update                 Update contents files\n");
-	printf("-a | --download-all           Download all issues\n");
-	printf("-d | --download-latest        Download latest issue\n");
-	printf("-m | --download-all-media     Download all media\n");
-	printf("-n | --download-latest-media  Download latest issue's media\n");
-	printf("-f | --force                  Force re-download of existing files\n");
-	printf("-t | --tocfile file           Use alternative contents xml file\n");
-	printf("-x | --mediatocfile file      Use alternative media contents xml file\n");
-	printf("-h | --help                   Print this help message\n");
-	printf("-v | --version                Print version information\n");
 }

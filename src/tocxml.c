@@ -28,15 +28,15 @@
 #include "issue.h"
 #include "getht.h"
 
-iss ** parsetoc(char *filepath, int * iss_no, int * latest);
-int parseissue(xmlDocPtr file, xmlNodePtr node, iss * cur_issue, int * latest);
+iss ** parsetoc(char *filepath, int * iss_no);
+int parseissue(xmlDocPtr file, xmlNodePtr node, iss * cur_issue);
 void parsesection(xmlDocPtr file, xmlNodePtr node, sec * cur_section);
 
 void tokenise_hyphons(char to_token[10], int * first, int * last);
 
 int no_of_issues;
 
-iss ** parsetoc(char *filepath, int * iss_no, int * latest)
+iss ** parsetoc(char *filepath, int * iss_no)
 /*	starts parsing of xml to issue structure	*/
 {
 	xmlDocPtr file;
@@ -78,7 +78,7 @@ iss ** parsetoc(char *filepath, int * iss_no, int * latest)
 							&(issue[no_of_issues]->date.lastmonth));
 
 					/* parse the issue */
-					parseissue(file, cnode, issue[no_of_issues], latest);
+					parseissue(file, cnode, issue[no_of_issues]);
 				}
 				cnode = cnode->next;
 			}
@@ -95,14 +95,11 @@ iss ** parsetoc(char *filepath, int * iss_no, int * latest)
 	return issue;
 }
 
-int parseissue(xmlDocPtr file, xmlNodePtr node, iss * cur_issue, int * latest)
+int parseissue(xmlDocPtr file, xmlNodePtr node, iss * cur_issue)
 /*	parses issue from xml, saving in cur_issue structure	*/
 {
 	strncpy(cur_issue->title, (char *) xmlGetProp(node, "title"), STR_MAX);
 	strncpy(cur_issue->preview_uri, (char *) xmlGetProp(node, "coverlink"), STR_MAX);
-
-	if(xmlGetProp(node, "current") && *latest==-1)
-		*latest = no_of_issues;
 
 	node = node->xmlChildrenNode;
 
