@@ -153,10 +153,10 @@ get help:
 .I http://lists.nongnu.org/mailman/listinfo/getht-general
 .TP
 .B Support Tracker 
-.I http://savannah.nongnu.org/support/?group=getht
+.I http://savannah.nongnu.org/support/?func=additem&group=getht
 .TP
 .B Bug Tracker
-.I http://savannah.nongnu.org/bugs/?group=getht
+.I http://savannah.nongnu.org/bugs/?func=additem&group=getht
 
 .SH LICENSE
 Copyright 2007 Nick White

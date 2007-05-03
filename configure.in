@@ -2,7 +2,7 @@
 # Process this file with autoconf to produce a configure script.
 
 AC_PREREQ(2.61)
-AC_INIT(getht, 0.0.1)
+AC_INIT(getht, pre_release)
 AC_CONFIG_SRCDIR([src/])
 AC_CONFIG_AUX_DIR([config])
 AC_CONFIG_HEADER([config.h])
