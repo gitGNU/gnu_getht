@@ -56,7 +56,7 @@ int main(int argc, char *argv[])
 	if(!opendir(getht_path))
 		if(mkdir(getht_path, S_IRWXU | S_IRGRP | S_IXGRP | S_IROTH | S_IXOTH))
 		{
-			fprintf(stderr,"Cannot open/create directory %s",getht_path);
+			fprintf(stderr,"Cannot open/create directory %s\n",getht_path);
 			printf("Please enter the path of a directory to save settings in: ");
 			scanf("%s", getht_path);
 		}

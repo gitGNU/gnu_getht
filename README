@@ -1,6 +1,6 @@
-GetHT - The Free Hinduism Today Digital Edition Fetcher
+GetHT - The Free Hinduism Today Digital Edition Downloader
 
-Summary:
+-Summary
 The nice people at Hinduism Today have recently begun freely distributing
 their magazine in pdf format, so that anybody may read a copy for free.
 
@@ -13,36 +13,37 @@ unable to download the new issues.
 
 This program is written to change all that.
 
-License:
-htde is released under the GPL, see the file COPYING for details.
+-License
+GetHT is released under the GPL, see the file COPYING for details.
 Basically this means that you are free to study the program, modify it,
 and redistribute it however you see fit, provided you extend the same
 freedom to others by releasing derivatives with the same license.
 
-Proxy Support:
+-Dependancies
+libxml2 2.0.0+  Compiled with zlib support
+libcurl 7.7.2+
+
+-Install
+For details on how to install GetHT see the INSTALL file.
+
+-Proxy Support
 GetHT supports HTTP, SOCKS4 & SOCKS5 proxys (though they haven't been
 thoroughly tested - let me know if there are any problems).
 Environmental variables (e.g. http_proxy) are used, but may be overridden
 with the following lines in the config.ini file. Any lines which are not
 needed (for example the authentication lines) should just be omitted.
 The format of the options is:
-proxy_type <type_of_proxy> (http, socks4 or socks5)
-proxy_address <address>
-proxy_port <port>
-proxy_auth <proxy_auth_method> (none, basic, digest or ntlm)
-proxy_user <proxy_username>
-proxy_pass <proxy_password>
+  proxy_type <type_of_proxy> (http, socks4 or socks5)
+  proxy_address <address>
+  proxy_port <port>
+  proxy_auth <proxy_auth_method> (none, basic, digest or ntlm)
+  proxy_user <proxy_username>
+  proxy_pass <proxy_password>
 
-Dependancies:
-libxml2         To parse the contents and media files; ensure to compile
-                with zlib support
-libcurl 7.7.2+  To download the necessary issues and periphery
-Unless compiled with "make nogui":
-fltk    2.0+    To draw and control the windows
-
-Install:
-The project is too small to warrent autoconf or anything else complex,
-so simply use the makefile provided to compile and install the software
-from source.
-
-For more details see the included INSTALL file.
+-Bugs / Problems
+This software is very new, so there will undoubtedly be some bugs lingering,
+or parts of the program which don't work as expected.
+If you encounter problems, there are several ways to get help:
+ Mailing List    : http://lists.nongnu.org/mailman/listinfo/getht-general
+ Support Tracker : http://savannah.nongnu.org/support/?group=getht
+ Bug Tracker     : http://savannah.nongnu.org/bugs/?group=getht

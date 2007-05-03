@@ -1,0 +1,167 @@
+.\" Copyright 2007 Nick White
+.\"
+.\" This file is part of GetHT
+.\"
+.\" This is free documentation; you can redistribute it and/or
+.\" modify it under the terms of the GNU General Public License as
+.\" published by the Free Software Foundation; either version 2 of
+.\" the License, or (at your option) any later version.
+.\"
+.\" The GNU General Public License's references to "object code"
+.\" and "executables" are to be interpreted as the output of any
+.\" document formatting or typesetting system, including
+.\" intermediate and printed output.
+.\"
+.\" This manual is distributed in the hope that it will be useful,
+.\" but WITHOUT ANY WARRANTY; without even the implied warranty of
+.\" MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+.\" GNU General Public License for more details.
+.\"
+.\" You should have received a copy of the GNU General Public License 
+.\" along with this program; if not, write to the Free Software
+.\" Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
+.TH GETHT 1
+.SH NAME 
+.B GetHT
+\- The Free Hinduism Today Digital Edition Downloader
+.SH SYNOPSIS
+.TP 5
+\fBgetht
+\fI[-uadmnfvh] [-t tocfile] [-m medtocfile]\fR
+
+.SH DESCRIPTION
+.PP
+.I GetHT
+is a program which downloads multimedia and pdf files 
+from Hinduism Today. It has good proxy support, and
+is small, fast, and simple.
+
+.I GetHT
+is not endorsed by or affiliated with Hinduism Today. 
+
+.SH OPTIONS
+.TP
+.B \-u, \-\-update
+Update the Hinduism Today contents files.
+.TP
+.B \-a, \-\-download-all
+Download all issues of Hinduism Today. 
+.TP
+.B \-d, \-\-download-latest
+Download only the latest issue of Hinduism Today.
+.TP
+.B \-m, \-\-download-all-media
+Download all multimedia files distributed by Hinduism 
+Today.
+.TP
+.B \-n, \-\-download-latest-media
+Download only the multimedia files from the latest 
+issue of Hinduism Today.
+.TP
+.B \-f, \-\-force
+Force getht to download files, even if they have
+already been downloaded. This is useful if a download
+has been corrupted or interrupted.
+.TP
+.B \-t, \-\-tocfile tocfile
+Use a different contents file, as specified by tocfile.
+.TP
+.B \-x, \-\-mediatocfile mediatocfile
+Use a different media contents file, as specified by
+mediatocfile.
+.TP
+.B \-h, \-\-help
+Print a brief usage message.
+.TP
+.B \-v, \-\-version
+Display the version number.
+
+.SH CONFIGURATION FILE
+All of the settings for GetHT are stored in the 
+configuration file, which normally resides in
+\fB~/.getht/config.ini\fR.
+
+The format of this file is very simple:
+\fB<option> = <setting>\fR
+with commented lines starting with a # 
+
+The following options may be set.
+.TP
+.B issuepath
+Stores the path in which all issues and multimedia 
+files will be saved. The default setting is
+\fB~/hinduism_today/\fR
+.TP
+.B startup_check
+Whether to automatically check for new issues each 
+time the GetHT is executed. \fB1\fR = yes, \fB0\fR = no
+The default setting is \fB0\fR
+.TP
+.B proxy_type
+The type of proxy (if any) through which GetHT is to
+pass. GetHT currently supports the following options:
+\fBhttp\fR, \fBsocks4\fR, and \fBsocks5\fR.
+To not use any proxy, simply leave out this line.
+.TP
+.B proxy_address
+The url of the proxy to connect through.
+.TP
+.B proxy_port
+The port of the proxy to connect to.
+.TP
+.B proxy_auth
+The method of authentication (if any) with the proxy.
+GetHT currently supports the following options:
+\fBbadic\fR, \fBdigest\fR, and \fBntlm\fR.
+If you don't need proxy authentication, leave out this
+line.
+.TP
+.B proxy_user
+The username with which to connect to the proxy server.
+.TP
+.B proxy_pass
+The password with which to connect to to proxy server.
+
+.SH FILES
+.TP
+.B ~/getht/config.ini
+configuration file.
+
+.SH BUGS
+.I GetHT
+is very new, so there will undoubtedly be some bugs
+around, or parts of the program which don't work as
+expected.
+
+If you encounter problems, there are several ways to
+get help:
+.TP
+.B Mailing List
+.I http://lists.nongnu.org/mailman/listinfo/getht-general
+.TP
+.B Support Tracker 
+.I http://savannah.nongnu.org/support/?group=getht
+.TP
+.B Bug Tracker
+.I http://savannah.nongnu.org/bugs/?group=getht
+
+.SH LICENSE
+Copyright 2007 Nick White
+
+This program is free software; you can redistribute it and/or
+modify it under the terms of the GNU General Public License 
+as published by the Free Software Foundation; either version 2
+of the License, or (at your option) any later version.
+
+This program is distributed in the hope that it will be useful,
+but WITHOUT ANY WARRANTY; without even the implied warranty of
+MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+GNU General Public License for more details.
+
+You should have received a copy of the GNU General Public License 
+along with this program; if not, write to the Free Software
+Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
+
+.SH AUTHOR
+GetHT is at present primarily the work of Nick White, see the AUTHORS
+file for full credits and contact details.

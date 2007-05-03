@@ -1,21 +1,32 @@
-At the moment this project uses a custom (but very basic) makefile
-to make and install. This will soon be changed to autotools, but at
-present this way works well enough.
+To install this package, simply follow the following steps:
 
-For a default install all that is needed is the following:
+1. Decompress & untar the archive
+   $ tar -xjf getht-<version>.tar.bz2
 
-1. Decompress/archive the project file:
-	tar -xzf getht-<version>.tar.gz
-or
-	tar -xyf getht-<version>.tar.bz2
+2. Change to the source directory
+   $ cd getht-<version>
 
-2. Change to hdte directory:
-	cd getht-<version>
+4. Prepare the software for your system
+   $ ./configure
 
-3. Run make to compile the source:
-	make
+   Note that there are several options which can be applied
+   here, such as prefix and locations of libraries.
+   For more information run:
+   $ ./configure --help
 
-4. Use make again to install it (you'll need to have root privilages):
-	make install
+4. Build the software
+   $ make
 
-For further build options, see the output of "make help"
+5. Install the software (ensure that you have superuser
+   privilages if installing outside of your home directory)
+   $ make install
+
+
+You can then run the package by typing the following
+command into a terminal:
+$ getht
+
+Note that the AutoTools scripts to build and install GetHT are
+quite simple, and have not been thoroughly tested.
+If you encounter any problems building please let me know, using
+one of the methods suggested in the README file.
