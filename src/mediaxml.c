@@ -240,7 +240,7 @@ iss ** parsemedia(char * filepath, iss ** issue, int * no_of_issues)
 
 	xmlFreeDoc(media_file);
 
-	issuesort(issue, no_of_issues);
+	issuesort(issue, *no_of_issues);
 
 	return issue;
 }

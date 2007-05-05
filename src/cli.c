@@ -33,6 +33,8 @@ void list_issues(iss ** issue, int no_of_issues, int verbose)
 	{
 		printf("[%i]\t", iss_no);
 		printf("%s\n", issue[iss_no]->title);
+		if(verbose >= 2)
+			printf("Year: %i; Months: %i - %i\n",issue[iss_no]->date.year,issue[iss_no]->date.firstmonth,issue[iss_no]->date.lastmonth);
 		if(verbose >= 1)
 		{
 			for(sec_no=0; sec_no<=issue[iss_no]->no_of_sections; sec_no++)
@@ -65,6 +67,8 @@ void list_media(iss ** issue, int no_of_issues, int verbose)
 		if(issue[iss_no]->no_of_media >= 0)
 		{
 			printf("%s\n", issue[iss_no]->title);
+			if(verbose >= 2)
+				printf("Year: %i; Months: %i - %i\n",issue[iss_no]->date.year,issue[iss_no]->date.firstmonth,issue[iss_no]->date.lastmonth);
 			for(med_no=0; med_no <= (issue[iss_no]->no_of_media); med_no++, med_global++)
 			{
 				printf("[%i]\t", med_global);
@@ -72,8 +76,11 @@ void list_media(iss ** issue, int no_of_issues, int verbose)
 				if(verbose >= 1)
 				{
 					printf("\t%s\n", issue[iss_no]->media[med_no]->uri);
-					if(verbose >=2 && issue[iss_no]->media[med_no]->comment[0]!='\0')
+					if(verbose >=2)
+					{
+						if(issue[iss_no]->media[med_no]->comment[0]!='\0')
 							printf("\t%s\n", issue[iss_no]->media[med_no]->comment);
+					}
 				}
 			}
 		}
