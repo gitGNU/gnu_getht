@@ -19,4 +19,4 @@
  *
  */
 
-#define VERSION "pre_release"
+#define VERSION "0.0.1"
