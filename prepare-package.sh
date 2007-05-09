@@ -37,8 +37,8 @@ rm -rf \{arch\}
 rm -rf .arch_ids
 rm -f ++log.getht*
 
-# ensure version number in configure.in is set correctly
-sed -i "s|^AC_INIT(getht, .*)$|AC_INIT(getht, $VERSION)|" configure.in
+# ensure version number in configure.ac is set correctly
+sed -i "s|^AC_INIT(getht, .*)$|AC_INIT(getht, $VERSION)|" configure.ac
 
 echo Building necessary autotools parts
 autoreconf -i
