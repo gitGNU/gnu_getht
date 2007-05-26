@@ -22,6 +22,9 @@ dnl check for libxml2
 AM_PATH_XML2([2.0.0])
 CFLAGS="$CFLAGS $XML_CPPFLAGS"
 LIBS="$LIBS $XML_LIBS"
+#PKG_CHECK_MODULES(libxml-2.0)
+#AC_SUBST(XML_CPPFLAGS)
+#AC_SUBST(XML_LIBS)
 
 dnl check for libcurl
 LIBCURL_CHECK_CONFIG([yes], [7.7.2])

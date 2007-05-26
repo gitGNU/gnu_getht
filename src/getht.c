@@ -39,6 +39,7 @@ proxytype proxy_type; char proxy_addr[STR_MAX]; long proxy_port;
 proxyauth proxy_auth; 
 char proxy_user[STR_MAX]; char proxy_pass[STR_MAX];
 char issue_xml[STR_MAX]; char media_xml[STR_MAX]; char media_rev[STR_MAX];
+char issue_url[STR_MAX]; char media_url[STR_MAX];
 CURL *main_curl_handle; 
 
 int main(int argc, char *argv[])
@@ -61,6 +62,9 @@ int main(int argc, char *argv[])
 	snprintf(media_xml,STR_MAX, "%s/%s", getht_path, MED_XML_FILE);
 	snprintf(media_rev,STR_MAX,"%s/%s",getht_path,MED_REVGZ_FILE);
 
+	strncpy(issue_url,XML_TOC_URL,STR_MAX);
+	strncpy(media_url,MEDIA_TOC_URL,STR_MAX);
+
 	snprintf(save_path,STR_MAX,"%s/hinduism_today",getenv("HOME"));
 
 	int downall = 0, downallmedia = 0;
@@ -78,7 +82,7 @@ int main(int argc, char *argv[])
 	proxy_pass[0] = '\0';
 
 	if(loadconfig(getht_path, &save_path, &update) != 0)
-		writefreshconfig(getht_path, &save_path, &update);
+		writefreshconfig(getht_path, &save_path, &update, &issue_url, &media_url);
 
 	if(!opendir(save_path))
 		if(mkdir(save_path, S_IRWXU | S_IRGRP | S_IXGRP | S_IROTH | S_IXOTH))
@@ -148,12 +152,10 @@ int main(int argc, char *argv[])
 				option = 1;
 				break;
 			case 't':
-				strcpy(issue_xml, strdup(optarg));
-				option = 1;
+				strncpy(issue_xml, strdup(optarg), STR_MAX);
 				break;
 			case 'x':
-				strcpy(media_xml, strdup(optarg));
-				option = 1;
+				strncpy(media_xml, strdup(optarg), STR_MAX);
 				break;
 			case 'h':
 				showusage();
@@ -277,7 +279,7 @@ int main(int argc, char *argv[])
 int update_contents_files()
 /* Returns 0 on success, 1 on failure */
 {
-	if(save_file(NULL, XML_TOC_URL, issue_xml))
+	if(save_file(NULL, issue_url, issue_xml))
 		return 1;
 	
 	char isstitle[STR_MAX];
@@ -295,7 +297,7 @@ int update_contents_files()
 
 	if(media_accounted_for(media_xml, &date))
 	{
-		if(save_file(NULL, MEDIA_TOC_URL, media_rev))
+		if(save_file(NULL, media_url, media_rev))
 			return 1;
 	
 		med ** temp_med;
@@ -309,30 +311,4 @@ int update_contents_files()
 	}
 
 	return 0;
-}
-
-int findnewestiss(iss ** issue, int no_of_issues)
-/*	returns newest issue indice */
-{
-	iss * tmp_issue; issdates newest;
-	int new_iss;
-
-	new_iss = -1;
-	newest.year = 0; newest.firstmonth = 0; newest.lastmonth = 0;
-
-	int i;
-
-	for(i = 0; i <= no_of_issues; i++)
-	{
-		if(issue[i]->date.year > newest.year ||
-			(issue[i]->date.year == newest.year && issue[i]->date.firstmonth > newest.firstmonth))
-		{
-			newest.year = issue[i]->date.year;
-			newest.firstmonth = issue[i]->date.firstmonth;
-			newest.lastmonth = issue[i]->date.lastmonth;
-			new_iss = i;
-		}
-	}
-
-	return new_iss;
 }

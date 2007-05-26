@@ -110,6 +110,16 @@ Whether to automatically check for new issues each
 time the GetHT is executed. \fB1\fR = yes, \fB0\fR = no
 The default setting is \fB0\fR
 .TP
+.B toc_url
+A url to the xml file containing the table of contents 
+for the publication.
+Default: \fBhttp://www.hinduismtoday.com/digital/htde_toc.xml\fR
+.TP
+.B mediatoc_url
+A url to the rev.gz file listing the media included with 
+the publication.
+Default: \fBhttp://www.hinduismtoday.com/digital/htde_media-player.rev.gz\fR
+.TP
 .B proxy_type
 The type of proxy (if any) through which GetHT is to
 pass. GetHT currently supports the following options:
