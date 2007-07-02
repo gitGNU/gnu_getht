@@ -75,10 +75,11 @@ med ** parsemediagz(char * media_path, int * no_of_media)
 
 				removeleadingspace(cur_line);
 
-				if(!strncmp(cur_line,"set the filename of player \"player1\" to \"",41))
+				if(!strncmp(cur_line,"set the filename of player \"", 28))
 				{
 					/* todo: check if smil, if so follow to find uri */
-					sscanf(cur_line,"set the filename of player \"player1\" to \"%s\"",cur_media->uri);
+					//sscanf(cur_line,"set the filename of player \"player1\" to \"%s\"",cur_media->uri);
+					sscanf(cur_line,"set the filename of player \"%[^\"] to \"%s\"",NULL,cur_media->uri);
 					cur_media->uri[strlen(cur_media->uri)-1] = '\0'; /* workaround extra character */
 				}
 				else if(!strncmp(cur_line,"set the label of this stack to \"",32))

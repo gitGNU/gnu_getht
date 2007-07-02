@@ -34,7 +34,8 @@ int ready_xml(char * filepath, char * rootnode, xmlDocPtr * file, xmlNodePtr * n
 	if(access(filepath, R_OK) != 0)
 		return 1;
 
-	if((*file = xmlParseFile(filepath)) == NULL)
+//	if((*file = xmlParseFile(filepath)) == NULL)
+	if((*file = xmlReadFile(filepath, "ISO-8859-1", 0)) == NULL)
 	{
 		fprintf(stderr, "Error: cannot open xml file %s\n", filepath);
 		return 1;

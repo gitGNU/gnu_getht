@@ -1,2 +1,33 @@
-getht.c
-	running clearmed clears unrelated title in update media section
+!! BIG BUG !!
+read media xml crashes, as cannot find any issue info, so sets issue & leaves an item with all blank fields
+a few things to fix with this:
+
+	read rev:
+		at the moment looks for
+			set the filename of player \"player1\" to \"%s\"
+			set the filename of player \"player1\" to \"
+		however, "player1" has now been changed to "PubDesk"
+		therefore change scanning routine to along the lines of
+			set the filename of player \"*\" to \"%s\"
+		more complex but worthwhile
+		-also-
+		if no url is found inside a "on mouseUp" clause, do not keep a blank media entry
+		best way to do this would be to:
+			dealloc the media item,
+			realloc the pointer array,
+			and -1 to no_of_media
+
+	read media xml:
+		should not segfault if it finds an empty item
+		prob needs to check that string is not blank before trying to copy info
+
+further progress:
+-	main obstacle is that "on mouseUp" no longer necessarily follows a newline - file now less organised still
+	therefore we'll have to scan each line (except when already in useful clause (check this) char by char for the occurance
+	best way to do this would be to scan char by char, and if one worthwhile is found to copy from the start to a new string for parsing
+	worth spending a few minutes checking if there's a library function out there to do this, if not create a simple generic one, using pointers, roughly of the form:
+		int containstring(char * toparse, char * match), returning 1 if found and 0 otherwise
+-	change of scanning routine has been done, but is untested
+	consider changing for an improved getquote which can take the nth quote
+		this is due to it being best not to rely on end of lines at end of bit we're interested in
+-	2nd clause of above (if no url is found) is very important now, as majority are unuseful
