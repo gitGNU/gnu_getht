@@ -228,7 +228,10 @@ iss ** parsemedia(char * filepath, iss ** issue, int * no_of_issues)
 					if(xmlGetProp(itnode, "preview"))
 						strncpy(cur_media->preview_uri, (char *) xmlGetProp(itnode, "preview_uri"), STR_MAX);
 
-					strncpy(cur_media->title, (char *) xmlNodeListGetString(media_file, itnode->xmlChildrenNode, 1), STR_MAX);
+					if((char *) xmlNodeListGetString(media_file, itnode->xmlChildrenNode, 1))
+						strncpy(cur_media->title, (char *) xmlNodeListGetString(media_file, itnode->xmlChildrenNode, 1), STR_MAX);
+					else
+						strncpy(cur_media->title, "untitled", STR_MAX);
 				}
 				
 				itnode = itnode->next;

@@ -26,7 +26,7 @@
 #define ISS_XML_FILE	"htde_toc.xml"
 #define MED_REVGZ_FILE	"htde_media-player.rev.gz"
 
-#define STR_MAX		512
+#define STR_MAX		1024
 
 #define MAX_ISS		10
 

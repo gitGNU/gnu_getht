@@ -17,17 +17,65 @@ a few things to fix with this:
 			realloc the pointer array,
 			and -1 to no_of_media
 
-	read media xml:
-		should not segfault if it finds an empty item
-		prob needs to check that string is not blank before trying to copy info
 
 further progress:
 -	main obstacle is that "on mouseUp" no longer necessarily follows a newline - file now less organised still
-	therefore we'll have to scan each line (except when already in useful clause (check this) char by char for the occurance
-	best way to do this would be to scan char by char, and if one worthwhile is found to copy from the start to a new string for parsing
+	therefore we'll have to scan each line (except when already in useful clause (check this)) char by char for the occurance
+	best way to do this would be to scan char by char, and if one worthwhile is found to copy from this point to a new string for parsing
 	worth spending a few minutes checking if there's a library function out there to do this, if not create a simple generic one, using pointers, roughly of the form:
 		int containstring(char * toparse, char * match), returning 1 if found and 0 otherwise
 -	change of scanning routine has been done, but is untested
 	consider changing for an improved getquote which can take the nth quote
 		this is due to it being best not to rely on end of lines at end of bit we're interested in
 -	2nd clause of above (if no url is found) is very important now, as majority are unuseful
+
+
+currently (16/08/2007):
+
+the strcontains does not appear to be working correctly; appears to accept any line as a match
+this then creates a bunch of structures, which eventually become confused
+	this may point to some niggling bug in the memory management, but for the moment focus on correct basic rev parsing
+
+currently (28/11/2007):
+
+strcontains works mostly - check the TODO
+the sscanf for extracting uri isn't working - best to just have a slightly more sophisticated getquote function
+next actions:
+	/no_of_media strangely changes where it's pointing to to be "out of bounds" half way through
+	/	always gets stuck on 'Geometry'
+	/	must have an overflow, prob in strcontains (only happens when it's used lots)
+	/	rewrite strcontains using array arithmetic - easier to maintain
+	/ensure whole lines are always parsed (not just first parts thereof) [should now be done]
+	/	to test search output for 1st reference to Publisher, and see if a few lines above is a successful on mouseUp recognition
+	/	get rid of ugly & unnecessary extra checks, which are put there just to ensure nothing bad happens in the delicate phase
+
+currently (09/12/2007)
+
+strcontains has been rewritten to use friendly arrays; appears to work fine (though not heavily tested)
+getting a str has been rewritten into a function: gzgetstr ; appears to work fine thouth also not well tested
+
+note - arch changes they've made:
+only one regular media item (in form of earlier)
+now a new "songs" section, with neat urls following "SongsURLs" (when not in on mouseUp section)
+	song titles follow, again on separate neat lines, but without any easy delimiter to hook on to
+there is also a video section in a "on menupick pItem" clause
+	different syntax to traditional
+	has to work out url using quality choices from pItem (high, med, low; given below)
+	won't be too hard, just be somewhat tricky to get the different options (start with them hardcoded, i.e. on "put tSize & '.mov' after tURL" just make 3 items with high, med, & low qualities
+there is also an interviews section, which looks very similar to Songs (InterviewsURLs)
+	note that interview names are encased in html
+there are also thumbnail jpgs, but they needn't be handled for a while
+
+next actions:
+	improve getquote to point where sscanf line is replaced [e.g. allow to only return quote n (and ignore prev)]
+	only include stack if it has a uri attached (otherwise throw away)
+
+18/12/07
+
+getquote has been rewritten to extract an arbitrary quote n
+empty uri strings are ignored
+
+TODO w/bugs
+generally:
+
+we should be able to read rev.gz / xml from hd, to save time & server hitting with testing

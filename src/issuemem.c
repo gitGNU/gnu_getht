@@ -125,7 +125,7 @@ med ** assignnew_med(med ** media, int * no_of_media)
 	(*no_of_media)++;                                         
 
 	/* make new array item a pointer to issue */
-	if( (tmp[*no_of_media] = malloc(sizeof(med))) == NULL )
+	if( ( tmp[*no_of_media] = malloc(sizeof(med)) ) == NULL )
 		nogo_mem();
 
 	return tmp;

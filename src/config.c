@@ -72,7 +72,7 @@ int loadconfig(char * htde_path, char * issue_path, int * update)
 				proxy_type = SOCKS5;
 			else
 				fprintf(stderr,
-					"Proxy type %s not known, please use either http, socks4 or socks5",
+					"Proxy type %s not known, please use either http, socks4 or socks5\n",
 					parameter);
 		}
 		else if(!strcmp(option, "proxy_address"))

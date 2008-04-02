@@ -26,16 +26,19 @@
 #include "getht.h"
 #include "issue.h"
 
-int smilurl(char * smilurl, med * cur_media);
-void getquote(char * input, char * label);
-void removeleadingspace(char * cur_line);
+int gzgetstr(char * newstr, gzFile * gzfile);
+int getquote(char * input, char * quote, int number);
+int strcontains(char * source, char * comparison);
 
 med ** parsemediagz(char * media_path, int * no_of_media)
 /*	Parses gzipped adobe pagemaker files for media urls and metadata,
  *	filling media with the information. */
 {
+	char c;
 	char cur_line[STR_MAX];
 	gzFile mediagz;
+
+	*no_of_media = -1;
 
 	med ** media = NULL;
 
@@ -47,13 +50,10 @@ med ** parsemediagz(char * media_path, int * no_of_media)
 
 	while(gzeof(mediagz)==0)
 	{
-		gzgets(mediagz, cur_line, STR_MAX);
-		cur_line[strlen(cur_line)-1] = '\0'; /* get rid of trailing newline */
+		gzgetstr(cur_line, mediagz);
 
-		if(!strcmp(cur_line,"on mouseUp"))
+		if(strcontains(cur_line,"on mouseUp") == 0)
 		{
-			strcpy(cur_line,""); /* reset cur_line */
-
 			/* assign memory for the new media */
 			media = assignnew_med(media, no_of_media);
 
@@ -67,30 +67,22 @@ med ** parsemediagz(char * media_path, int * no_of_media)
 			cur_media->size = 0;
 
 			/* process rev file */
-			while(strcmp(cur_line,"end mouseUp") && gzeof(mediagz)==0)
+			while(strcontains(cur_line,"end mouseUp") && gzeof(mediagz)==0)
 			{
 				strcpy(cur_line,""); /* reset cur_line */
-				gzgets(mediagz, cur_line, STR_MAX);
-				cur_line[strlen(cur_line)-1] = '\0'; /* remove trailing newline */
+				gzgetstr(cur_line, mediagz);
 
-				removeleadingspace(cur_line);
-
-				if(!strncmp(cur_line,"set the filename of player \"", 28))
-				{
-					/* todo: check if smil, if so follow to find uri */
-					//sscanf(cur_line,"set the filename of player \"player1\" to \"%s\"",cur_media->uri);
-					sscanf(cur_line,"set the filename of player \"%[^\"] to \"%s\"",NULL,cur_media->uri);
-					cur_media->uri[strlen(cur_media->uri)-1] = '\0'; /* workaround extra character */
-				}
-				else if(!strncmp(cur_line,"set the label of this stack to \"",32))
-				{
-					getquote(cur_line,cur_media->title);
-				}
-				else if(!strncmp(cur_line,"statusMsg \(\"",12))
-				{
-					getquote(cur_line,cur_media->comment);
-				}
+				if(!strcontains(cur_line,"set the filename of player \"") && strcontains(cur_line,"empty"))
+					getquote(cur_line, cur_media->uri, 2);
+				else if(!strcontains(cur_line,"set the label of this stack to"))
+					getquote(cur_line, cur_media->title, 1);
+				else if(!strcontains(cur_line,"statusMsg\(\"") || !strcontains(cur_line,"StatusMsg \(\""))
+					getquote(cur_line, cur_media->comment, 1);
 			}
+
+			/* if it turns out that there was nothing useful there, remove the new media */
+			if(cur_media->uri[0] == '\0')
+				(*no_of_media)--;
 		}
 		strcpy(cur_line,""); /* reset cur_line */
 	}
@@ -98,19 +90,20 @@ med ** parsemediagz(char * media_path, int * no_of_media)
 	return media;
 }
 
-int smilurl(char * smilurl, med * cur_media)
-/*	Extracts url and other data from remote smil file, storing
- *	the info in the cur_media structure. */
+int getquote(char * input, char * quote, int number)
+/*	assigns quote string from a line of the format:
+ *	'something "quote" something' */
 {
-	return 0;
-}
+	int curnum;
 
-void getquote(char * input, char * quote)
-/*	sets quote from a line of the format:
- *	`something "quote" something' */
-{
-	char * cur_pos;
-	cur_pos = quote;
+	/* advance past earlier quotes */
+	for(curnum=0; curnum < ((number*2)-2); curnum++)
+	{
+		/* advance until " character is reached */
+		while(*input != '"' && *input)	
+			input++;
+		input++;
+	}
 
 	/* advance until " character is reached */
 	while(*input != '"' && *input)	
@@ -119,33 +112,67 @@ void getquote(char * input, char * quote)
 	input++;
 
 	/* copy characters in until next '"' */
-	while(*input != '"' && *input)
+	while(*input != '"')
 	{
-		*cur_pos = *input;
-		cur_pos++;
+		/* if end is found without closing bracket,
+		 * exit with error */
+		if(! *input)
+			return 1;
+		*quote = *input;
+		quote++;
 		input++;
 	}
 
-	*cur_pos = '\0';
+	*quote = '\0';
+
+	return 0;
 }
 
-void removeleadingspace(char * cur_line)
+int strcontains(char * source, char * comparison)
 {
-	int tmp, newpos;
+	int srcpos = 0; /* position in source string */
+	int compos = 0; /* position in comparison string */
 
-	char temp_str[STR_MAX];
+	while(srcpos < strlen(source) && srcpos < STR_MAX)
+	{
+		/* if the chars match, move to the next in comparison,
+		 * otherwise only advance the source */
+		if(source[srcpos] == comparison[compos])
+			compos++;
+		else
+			compos = 0;
 
-	/* advance past whitespace */
-	tmp = 0;
-	while (cur_line[tmp] == ' ' || cur_line[tmp] == '\t')
-		tmp++;
+		/* if we got to the end of comparison, there's a match */
+		if(compos == strlen(comparison))
+			return 0;
 
-	/* copy from there to temp_str */
-	for(newpos = 0; cur_line[tmp]; tmp++, newpos++)
-		temp_str[newpos] = cur_line[tmp];
+		srcpos++;
+	}
 
-	temp_str[newpos] = '\0';
+	/* if we got all the way through the source, there's no match */
+	return 1;
+}
 
-	/* copy temp_str to cur_line */
-	strncpy(cur_line, temp_str, sizeof(temp_str));
+int gzgetstr(char * newstr, gzFile * gzfile)
+/*	a reimplementation of gzgetstr, which doesn't choke at odd characters
+ */
+{
+	strcpy(newstr,""); /* reset cur_line */
+	char c;
+
+	while((c = gzgetc(gzfile)) != -1)
+	{
+		if(c == '\n')
+			break;
+
+		/* append the char if there's room in the str */
+		if(strlen(newstr)+1 < STR_MAX)
+			strncat(newstr,&c,1);
+		/* if the line is too long just break to pick up the 2nd half on next pass,
+		 * not perfect (will miss strs cut into 2 sections), but good enough for now */
+		else
+			break;
+	}
+
+	return 0;
 }

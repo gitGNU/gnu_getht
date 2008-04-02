@@ -134,7 +134,10 @@ int update_progress(void *data, double dltotal, double dlnow,
 /*	Print status information */
 {
 	double frac;
-	frac = 100 * dlnow / dltotal;
+	if(dlnow > 0)
+		frac = 100 * dlnow / dltotal;
+	else
+		frac = 0;
 	printf("\rDownload progress: %3.0lf%% ", frac);
 	fflush(stdout);
 
