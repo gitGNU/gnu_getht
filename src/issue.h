@@ -47,31 +47,16 @@ typedef struct
 
 typedef struct
 {
-	char uri[512];
-	char title[512];
-	char comment[512];
-	char preview_uri[512];
-	int size;
-} med;
-
-typedef struct
-{
 	char preview_uri[512];
 	char title[512];
 	int size;
 	issdates date;
 	sec ** section;
 	int no_of_sections;
-	med ** media;
-	int no_of_media;
 } iss;
 
 iss ** parsetoc(char *filepath, int * iss_no);
-iss ** parsemedia(char * filepath, iss ** issue, int * no_of_issues);
-
-med ** parsemediagz(char * media_path, int * no_of_media);
 
 iss ** assignnew_iss(iss ** issue, int *no_of_issues);
 sec ** assignnew_sec(sec ** section, int * no_of_sections);
 it ** assignnew_it(it ** item, int * no_of_items);
-med ** assignnew_med(med ** media, int * no_of_media);

@@ -33,13 +33,11 @@
 
 int update_contents_files();
 
-med * findnewestmed(iss ** issue, int no_of_issues);
-
 proxytype proxy_type; char proxy_addr[STR_MAX]; long proxy_port;
 proxyauth proxy_auth; 
 char proxy_user[STR_MAX]; char proxy_pass[STR_MAX];
-char issue_xml[STR_MAX]; char media_xml[STR_MAX]; char media_rev[STR_MAX];
-char issue_url[STR_MAX]; char media_url[STR_MAX];
+char issue_xml[STR_MAX];
+char issue_url[STR_MAX];
 CURL *main_curl_handle; 
 
 int main(int argc, char *argv[])
@@ -59,18 +57,14 @@ int main(int argc, char *argv[])
 		}
 
 	snprintf(issue_xml,STR_MAX,"%s/%s",getht_path,ISS_XML_FILE);
-	snprintf(media_xml,STR_MAX, "%s/%s", getht_path, MED_XML_FILE);
-	snprintf(media_rev,STR_MAX,"%s/%s",getht_path,MED_REVGZ_FILE);
 
 	strncpy(issue_url,XML_TOC_URL,STR_MAX);
-	strncpy(media_url,MEDIA_TOC_URL,STR_MAX);
 
 	snprintf(save_path,STR_MAX,"%s/hinduism_today",getenv("HOME"));
 
-	int downall = 0, downallmedia = 0;
+	int downall = 0;
 	int downissue = 0, downissueno = -1;
-	int downmedia = 0, downmediano = -1;
-	int listissues = 0, listmedia = 0;
+	int listissues = 0;
 	int force = 0, update = 0;
 	int verbose = 0, option = 0;
 
@@ -82,7 +76,7 @@ int main(int argc, char *argv[])
 	proxy_pass[0] = '\0';
 
 	if(loadconfig(getht_path, &save_path, &update) != 0)
-		writefreshconfig(getht_path, &save_path, &update, &issue_url, &media_url);
+		writefreshconfig(getht_path, &save_path, &update, &issue_url);
 
 	if(!opendir(save_path))
 		if(mkdir(save_path, S_IRWXU | S_IRGRP | S_IXGRP | S_IROTH | S_IXOTH))
@@ -100,14 +94,10 @@ int main(int argc, char *argv[])
 	{
 		{"download-all", no_argument, 0, 'a'},
 		{"download-issue", required_argument, 0, 'd'},
-		{"download-media", required_argument, 0, 'n'},
-		{"download-all-media", no_argument, 0, 'o'},
 		{"force", no_argument, 0, 'f'},
 		{"list-issues", no_argument, 0, 'l'},
-		{"list-media", no_argument, 0, 'm'},
 		{"update", no_argument, 0, 'u'},
 		{"tocfile", required_argument, 0, 't'},
-		{"mediatocfile", required_argument, 0, 'x'},
 		{"help", no_argument, 0, 'h'},
 		{"verbose", no_argument, 0, 'v'},
 		{"version", no_argument, 0, 'V'},
@@ -129,20 +119,6 @@ int main(int argc, char *argv[])
 				listissues = 1;
 				option = 1;
 				break;
-			case 'm':
-				listmedia = 1;
-				option = 1;
-				break;
-			case 'o':
-				downallmedia = 1;
-				downmedia = 1;
-				option = 1;
-				break;
-			case 'n':
-				downmedia = 1;
-				downmediano = atoi(optarg);
-				option = 1;
-				break;
 			case 'f':
 				force = 1;
 				option = 1;
@@ -153,9 +129,6 @@ int main(int argc, char *argv[])
 				break;
 			case 't':
 				strncpy(issue_xml, strdup(optarg), STR_MAX);
-				break;
-			case 'x':
-				strncpy(media_xml, strdup(optarg), STR_MAX);
 				break;
 			case 'h':
 				showusage();
@@ -222,53 +195,9 @@ int main(int argc, char *argv[])
 			downloadissue(NULL, save_path, issue[downissueno], force);
 	}
 	
-	if(downmedia || listmedia)
-	{
-		int newest;
-
-		issue = parsemedia(media_xml, issue, &no_of_issues);
-
-		if(!issue)
-		{
-			if(!update)
-			{
-				printf("Cannot open media contents file, trying to update contents\n");
-				if(update_contents_files())
-					return 1;
-				issue = parsemedia(media_xml, issue, &no_of_issues);
-			}
-			else
-			{
-				printf("Cannot open contents file, try running `getht --update`\n");
-				return 1;
-			}
-		}
-
-		if(downallmedia)
-		{
-			for(i = 0; i <= no_of_issues; i++)
-			{
-				for(newest = 0; newest <= issue[i]->no_of_media; newest++)
-					downloadmedia(NULL, save_path, issue[i]->media[newest], force);
-			}
-		}
-		else if(downmediano >= 0)
-		{
-			int med_global, med_no;
-
-			for(i=0,med_global=0; i<=no_of_issues; i++)
-				if(issue[i]->no_of_media >= 0)
-					for(med_no=0; med_no <= (issue[i]->no_of_media); med_no++,med_global++)
-						if(med_global == downmediano)
-							downloadmedia(NULL, save_path, issue[i]->media[med_no], force);
-		}
-	}
 
 	if(listissues)
 		list_issues(issue, no_of_issues, verbose);
-
-	if(listmedia)
-		list_media(issue, no_of_issues, verbose);
 
 	/* Ensure curl cleans itself up */
 	curl_easy_cleanup(main_curl_handle);
@@ -281,34 +210,6 @@ int update_contents_files()
 {
 	if(save_file(NULL, issue_url, issue_xml))
 		return 1;
-	
-	char isstitle[STR_MAX];
-	issdates date;
-
-	/*	see if current issue's media toc has already
-		been written to the xml, if not do so */
-	if(access(issue_xml, R_OK) == 0)
-	{
-		if(cur_identifiers(issue_xml, isstitle, &date))
-			return 1;
-	}
 	else
-		return 1;
-
-	if(media_accounted_for(media_xml, &date))
-	{
-		if(save_file(NULL, media_url, media_rev))
-			return 1;
-	
-		med ** temp_med;
-		int med_no = -1;
-
-		temp_med = parsemediagz(media_rev, &med_no);
-
-		unlink(media_rev);
-
-		addmediaissue(media_xml, isstitle, &date, temp_med, med_no);
-	}
-
-	return 0;
+		return 0;
 }

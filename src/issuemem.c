@@ -107,30 +107,6 @@ it ** assignnew_it(it ** item, int * no_of_items)
 	return tmp;
 }
 
-med ** assignnew_med(med ** media, int * no_of_media)
-{
-	med ** tmp = NULL;
-
-	if(*no_of_media < 0)
-	{       /* make **section a new array of section pointers */
-		if( (tmp = malloc(sizeof(med *))) == NULL )
-			nogo_mem();
-	}
-	else
-	{       /* add a new pointer to media pointer list */
-		if( (tmp = realloc(media, sizeof(med *) + (((*no_of_media)+1) * sizeof(med *)))) == NULL )
-			nogo_mem();
-	}
-
-	(*no_of_media)++;                                         
-
-	/* make new array item a pointer to issue */
-	if( ( tmp[*no_of_media] = malloc(sizeof(med)) ) == NULL )
-		nogo_mem();
-
-	return tmp;
-}
-
 int issuesort(iss ** issue, int no_of_issues)
 /* does a basic bubble sort, by date, returning sorted issue */
 {

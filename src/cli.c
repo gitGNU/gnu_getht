@@ -59,47 +59,15 @@ void list_issues(iss ** issue, int no_of_issues, int verbose)
 	}
 }
 
-void list_media(iss ** issue, int no_of_issues, int verbose)
-{
-	int iss_no, med_no, med_global;
-	for(iss_no=0, med_global=0;iss_no<=no_of_issues;iss_no++)
-	{
-		if(issue[iss_no]->no_of_media >= 0)
-		{
-			printf("%s\n", issue[iss_no]->title);
-			if(verbose >= 2)
-				printf("Year: %i; Months: %i - %i\n",issue[iss_no]->date.year,issue[iss_no]->date.firstmonth,issue[iss_no]->date.lastmonth);
-			for(med_no=0; med_no <= (issue[iss_no]->no_of_media); med_no++, med_global++)
-			{
-				printf("[%i]\t", med_global);
-				printf("%s\n", issue[iss_no]->media[med_no]->title);
-				if(verbose >= 1)
-				{
-					printf("\t%s\n", issue[iss_no]->media[med_no]->uri);
-					if(verbose >=2)
-					{
-						if(issue[iss_no]->media[med_no]->comment[0]!='\0')
-							printf("\t%s\n", issue[iss_no]->media[med_no]->comment);
-					}
-				}
-			}
-		}
-	}
-}
-
 void showusage()
 {
 	printf("Usage: getht [-ualmofhv] [-d issno] [-n medno] [-t tocfile]\n");
 	printf("-u | --update                 Update contents files\n");
 	printf("-a | --download-all           Download all issues\n");
 	printf("-d | --download-issue issno   Download issue number issno\n");
-	printf("-n | --download-media medno   Download media number n\n");
-	printf("-o | --download-all-media     Download all media\n");
 	printf("-f | --force                  Force re-download of existing files\n");
 	printf("-l | --list-issues            List available issues\n");
-	printf("-m | --list-media             List available media\n");
 	printf("-t | --tocfile file           Use alternative contents xml file\n");
-	printf("-x | --mediatocfile file      Use alternative media contents xml file\n");
 	printf("-h | --help                   Print this help message\n");
 	printf("-v | --verbose                Make output more verbose\n");
 	printf("-V | --version                Print version information\n");

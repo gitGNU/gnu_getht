@@ -68,7 +68,6 @@ iss ** parsetoc(char *filepath, int * iss_no)
 					issue = assignnew_iss(issue, &no_of_issues);
 
 					/* setup issue globals */
-					issue[no_of_issues]->no_of_media = -1;
 					issue[no_of_issues]->no_of_sections = -1;
 					issue[no_of_issues]->date.year =
 						atoi( (const char *)(xmlStrsub(node->name,5,4)) );

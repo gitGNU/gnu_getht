@@ -32,9 +32,9 @@
 .SH DESCRIPTION
 .PP
 .I GetHT
-is a program which downloads multimedia and pdf files 
-from Hinduism Today. It has good proxy support, and
-is small, fast, and simple.
+is a program which downloads pdf files from Hinduism
+Today. It has good proxy support, and is small, fast,
+and simple.
 
 .I GetHT
 is not endorsed by or affiliated with Hinduism Today. 
@@ -51,14 +51,6 @@ Download all issues of Hinduism Today.
 Download the issue numbered issno (use \fI-l\fR to find
 issue numbers).
 .TP
-.B \-n, \-\-download-media medno
-Download the multimedia file numbered medno (use \fI-m\fR
-to find media numbers).
-.TP
-.B \-m, \-\-download-all-media
-Download all multimedia files distributed by Hinduism 
-Today.
-.TP
 .B \-f, \-\-force
 Force getht to download files, even if they have
 already been downloaded. This is useful if a download
@@ -68,16 +60,8 @@ has been corrupted or interrupted.
 List the issues of Hinduism Today, with issue numbers,
 sorted by date.
 .TP
-.B \m, \-\-list-media
-List the multimedia files associated with Hinduism 
-today, with media numbers, sorted by issue date.
-.TP
 .B \-t, \-\-tocfile tocfile
 Use a different contents file, as specified by tocfile.
-.TP
-.B \-x, \-\-mediatocfile mediatocfile
-Use a different media contents file, as specified by
-mediatocfile.
 .TP
 .B \-h, \-\-help
 Print a brief usage message.
@@ -101,9 +85,8 @@ with commented lines starting with a #
 The following options may be set.
 .TP
 .B issuepath
-Stores the path in which all issues and multimedia 
-files will be saved. The default setting is
-\fB~/hinduism_today/\fR
+Stores the path in which all issues will be saved
+The default setting is \fB~/hinduism_today/\fR
 .TP
 .B startup_check
 Whether to automatically check for new issues each 
@@ -114,11 +97,6 @@ The default setting is \fB0\fR
 A url to the xml file containing the table of contents 
 for the publication.
 Default: \fBhttp://www.hinduismtoday.com/digital/htde_toc.xml\fR
-.TP
-.B mediatoc_url
-A url to the rev.gz file listing the media included with 
-the publication.
-Default: \fBhttp://www.hinduismtoday.com/digital/htde_media-player.rev.gz\fR
 .TP
 .B proxy_type
 The type of proxy (if any) through which GetHT is to
