@@ -61,11 +61,10 @@ void showusage()
 {
 	printf("Usage: getht [-ualmofhv] [-d issno] [-n medno] [-t tocfile]\n");
 	printf("-u | --update                 Update contents files\n");
+	printf("-l | --list-issues            List available issues\n");
 	printf("-a | --download-all           Download all issues\n");
 	printf("-d | --download-issue issno   Download issue number issno\n");
 	printf("-f | --force                  Force re-download of existing files\n");
-	printf("-l | --list-issues            List available issues\n");
-	printf("-t | --tocfile file           Use alternative contents xml file\n");
 	printf("-h | --help                   Print this help message\n");
 	printf("-v | --verbose                Make output more verbose\n");
 	printf("-V | --version                Print version information\n");

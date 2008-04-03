@@ -96,7 +96,6 @@ int main(int argc, char *argv[])
 		{"force", no_argument, 0, 'f'},
 		{"list-issues", no_argument, 0, 'l'},
 		{"update", no_argument, 0, 'u'},
-		{"tocfile", required_argument, 0, 't'},
 		{"help", no_argument, 0, 'h'},
 		{"verbose", no_argument, 0, 'v'},
 		{"version", no_argument, 0, 'V'},
@@ -125,9 +124,6 @@ int main(int argc, char *argv[])
 			case 'u':
 				update = 1;
 				option = 1;
-				break;
-			case 't':
-				strncpy(issue_xml, strdup(optarg), STR_MAX);
 				break;
 			case 'h':
 				showusage();
