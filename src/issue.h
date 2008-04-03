@@ -18,8 +18,6 @@
  * 
  */
 
-/* all sizes are in bytes and are child-inclusive */
-
 typedef struct
 {
 	int year;

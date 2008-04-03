@@ -204,7 +204,6 @@ int cur_identifiers(char * filepath, char * title, issdates * date)
 {
 	xmlDocPtr file;
 
-//	if((file = xmlParseFile(filepath)) == NULL)
 	if((file =  xmlReadFile(filepath, "ISO-8859-1", 0)) == NULL)
 	{
 		return 1;
