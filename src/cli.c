@@ -59,7 +59,7 @@ void list_issues(iss ** issue, int no_of_issues, int verbose)
 
 void showusage()
 {
-	printf("Usage: getht [-ualmofhv] [-d issno] [-n medno] [-t tocfile]\n");
+	printf("Usage: getht [-ulafhvV] [-d issno]\n");
 	printf("-u | --update                 Update contents files\n");
 	printf("-l | --list-issues            List available issues\n");
 	printf("-a | --download-all           Download all issues\n");
