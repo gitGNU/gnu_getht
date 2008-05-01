@@ -36,7 +36,7 @@ proxytype proxy_type; char proxy_addr[STR_MAX]; long proxy_port;
 proxyauth proxy_auth; 
 char proxy_user[STR_MAX]; char proxy_pass[STR_MAX];
 char issue_xml[STR_MAX];
-char issue_url[STR_MAX];
+char issue_uri[STR_MAX];
 CURL *main_curl_handle; 
 
 int main(int argc, char *argv[])
@@ -57,7 +57,7 @@ int main(int argc, char *argv[])
 
 	snprintf(issue_xml,STR_MAX,"%s/%s",getht_path,ISS_XML_FILE);
 
-	strncpy(issue_url,XML_TOC_URL,STR_MAX);
+	strncpy(issue_uri,XML_TOC_URI,STR_MAX);
 
 	snprintf(save_path,STR_MAX,"%s/hinduism_today",getenv("HOME"));
 
@@ -75,7 +75,7 @@ int main(int argc, char *argv[])
 	proxy_pass[0] = '\0';
 
 	if(loadconfig(getht_path, &save_path, &update) != 0)
-		writefreshconfig(getht_path, &save_path, &update, &issue_url);
+		writefreshconfig(getht_path, &save_path, &update, &issue_uri);
 
 	if(!opendir(save_path))
 		if(mkdir(save_path, S_IRWXU | S_IRGRP | S_IXGRP | S_IROTH | S_IXOTH))
@@ -203,7 +203,7 @@ int main(int argc, char *argv[])
 int update_contents_files()
 /* Returns 0 on success, 1 on failure */
 {
-	if(save_file(NULL, issue_url, issue_xml, 0))
+	if(save_file(NULL, issue_uri, issue_xml, 0))
 		return 1;
 	else
 		return 0;

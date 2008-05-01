@@ -43,10 +43,10 @@ extern char proxy_user[STR_MAX];
 extern char proxy_pass[STR_MAX];
 extern CURL *main_curl_handle;
 
-int save_file(CURL *curl_handle, char *url, char *filepath, long resume_offset)
-/*	Save the file *url to *filepath */
+int save_file(CURL *curl_handle, char *uri, char *filepath, long resume_offset)
+/*	Save the file *uri to *filepath */
 {
-	printf("Downloading %s\n",url);
+	printf("Downloading %s\n",uri);
 
 	if(!curl_handle)
 		curl_handle = main_curl_handle;
@@ -60,7 +60,7 @@ int save_file(CURL *curl_handle, char *url, char *filepath, long resume_offset)
 			return 1;
 		}
 
-		curl_easy_setopt(curl_handle, CURLOPT_URL, url);
+		curl_easy_setopt(curl_handle, CURLOPT_URL, uri);
 		curl_easy_setopt(curl_handle, CURLOPT_READFUNCTION, read_func);
 		curl_easy_setopt(curl_handle, CURLOPT_WRITEFUNCTION, write_func);
 		curl_easy_setopt(curl_handle, CURLOPT_WRITEDATA, file);
@@ -110,7 +110,7 @@ int save_file(CURL *curl_handle, char *url, char *filepath, long resume_offset)
 		if(curl_easy_perform(curl_handle))
 		{
 			remove(filepath);
-			fprintf(stderr,"\nError, could not download %s: %s\n",url, errorinfo);
+			fprintf(stderr,"\nError, could not download %s: %s\n",uri, errorinfo);
 			return 1;
 		}
 
@@ -120,7 +120,7 @@ int save_file(CURL *curl_handle, char *url, char *filepath, long resume_offset)
 	}
 	else {
 		fprintf(stderr,"Error: curl failed to initialise.\n");
-		printf("Could not download %s\n",url);
+		printf("Could not download %s\n",uri);
 		return 1;
 	}
 	return 0;
@@ -148,7 +148,7 @@ int update_progress(void *data, double dltotal, double dlnow,
 	return 0;
 }
 
-double getremotefilesize(CURL *curl_handle, char *url)
+double getremotefilesize(CURL *curl_handle, char *uri)
 {
 	double filesize;
 
@@ -157,7 +157,7 @@ double getremotefilesize(CURL *curl_handle, char *url)
 
 	if(curl_handle) {
 
-		curl_easy_setopt(curl_handle, CURLOPT_URL, url);
+		curl_easy_setopt(curl_handle, CURLOPT_URL, uri);
 		curl_easy_setopt(curl_handle, CURLOPT_READFUNCTION, read_func);
 
 		/* don't download or return either body or header */

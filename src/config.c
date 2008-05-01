@@ -29,7 +29,7 @@ extern long proxy_port;
 extern proxyauth proxy_auth;
 extern char proxy_user[STR_MAX];
 extern char proxy_pass[STR_MAX];
-extern char issue_url[STR_MAX];
+extern char issue_uri[STR_MAX];
 
 int loadconfig(char * htde_path, char * issue_path, int * update)
 /*	Loads variables from config file to extern and passed
@@ -56,8 +56,8 @@ int loadconfig(char * htde_path, char * issue_path, int * update)
 			strncpy(issue_path, parameter, STR_MAX);
 		else if(!strcmp(option, "startup_check"))
 			*update = atoi(parameter);
-		else if(!strcmp(option, "toc_url"))
-			strncpy(issue_url, parameter, STR_MAX);
+		else if(!strcmp(option, "toc_uri"))
+			strncpy(issue_uri, parameter, STR_MAX);
 		else if(!strcmp(option, "proxy_type"))
 		{
 			if(!strcmp(parameter, "http"))
@@ -119,8 +119,8 @@ int writefreshconfig(char * htde_path, char * issue_path, int * update)
 		fprintf(config_file, "%s = %s\n", "issuepath", issue_path);
 	if(update)
 		fprintf(config_file, "%s = %i\n", "startup_check", *update);
-	if(issue_url[0])
-		fprintf(config_file, "%s = %s\n", "toc_url", issue_url);
+	if(issue_uri[0])
+		fprintf(config_file, "%s = %s\n", "toc_uri", issue_uri);
 	if(proxy_type != NONE)
 	{
 		if(proxy_type = HTTP)

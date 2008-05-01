@@ -18,10 +18,10 @@
  * 
  */
 
-#define XML_TOC_URL		"http://www.hinduismtoday.com/digital/htde_toc.xml"
+#define XML_TOC_URI		"http://www.hinduismtoday.com/digital/htde_toc.xml"
 
 /* currently unused - see 0.1 patch-30 for latest version parsing media */
-#define MEDIA_TOC_URL	"http://www.hinduismtoday.com/digital/htde_media-player.rev.gz"
+#define MEDIA_TOC_URI	"http://www.hinduismtoday.com/digital/htde_media-player.rev.gz"
 
 #define ISS_XML_FILE	"htde_toc.xml"
 
