@@ -139,9 +139,6 @@ get help:
 .B Mailing List
 .I http://lists.nongnu.org/mailman/listinfo/getht-general
 .TP
-.B Support Tracker 
-.I http://savannah.nongnu.org/support/?func=additem&group=getht
-.TP
 .B Bug Tracker
 .I http://savannah.nongnu.org/bugs/?func=additem&group=getht
 
