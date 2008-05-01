@@ -203,7 +203,7 @@ int main(int argc, char *argv[])
 int update_contents_files()
 /* Returns 0 on success, 1 on failure */
 {
-	if(save_file(NULL, issue_url, issue_xml))
+	if(save_file(NULL, issue_url, issue_xml, 0))
 		return 1;
 	else
 		return 0;
