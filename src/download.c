@@ -35,10 +35,10 @@ int write_func(void *ptr, size_t size, size_t nmemb, FILE *stream)
 int update_progress(void *data, double dltotal, double dlnow,
 					double ultotal, double ulnow);
 
-extern proxytype proxy_type;
+extern int proxy_type;
 extern char proxy_addr[STR_MAX];
 extern long proxy_port;
-extern proxyauth proxy_auth;
+extern int proxy_auth;
 extern char proxy_user[STR_MAX];
 extern char proxy_pass[STR_MAX];
 extern CURL *main_curl_handle;
@@ -65,35 +65,19 @@ int save_file(CURL *curl_handle, char *uri, char *filepath, long resume_offset)
 		curl_easy_setopt(curl_handle, CURLOPT_WRITEFUNCTION, write_func);
 		curl_easy_setopt(curl_handle, CURLOPT_WRITEDATA, file);
 
-		if(proxy_type != NONE)
+		if(proxy_type)
 		{
-			if(proxy_type == HTTP)
-				curl_easy_setopt(curl_handle, CURLOPT_PROXYTYPE, CURLPROXY_HTTP);
-			else if(proxy_type == SOCKS4)
-				curl_easy_setopt(curl_handle, CURLOPT_PROXYTYPE, CURLPROXY_SOCKS4);
-			else if(proxy_type == SOCKS5)
-				curl_easy_setopt(curl_handle, CURLOPT_PROXYTYPE, CURLPROXY_SOCKS5);
-
+			curl_easy_setopt(curl_handle, CURLOPT_PROXYTYPE, proxy_type);
 			curl_easy_setopt(curl_handle, CURLOPT_PROXY, proxy_addr);
-
 			if(proxy_port)
 				curl_easy_setopt(curl_handle, CURLOPT_PROXYPORT, proxy_port);
-
-			if(proxy_auth != NOAUTH)
+			if(proxy_auth)
+				curl_easy_setopt(curl_handle, CURLOPT_PROXYAUTH, proxy_auth);
+			if(proxy_user[0] && proxy_pass[0])
 			{
-				if(proxy_auth == BASIC)
-					curl_easy_setopt(curl_handle, CURLOPT_PROXYAUTH, CURLAUTH_BASIC);
-				else if(proxy_auth == DIGEST)
-					curl_easy_setopt(curl_handle, CURLOPT_PROXYAUTH, CURLAUTH_DIGEST);
-				else if(proxy_auth == NTLM)
-					curl_easy_setopt(curl_handle, CURLOPT_PROXYAUTH, CURLAUTH_NTLM);
-
-				if(proxy_user[0] && proxy_pass[0])
-				{
-					char userpass[STR_MAX];
-					snprintf(userpass, STR_MAX, "%s:%s", proxy_user, proxy_pass);
-					curl_easy_setopt(curl_handle, CURLOPT_PROXYUSERPWD, userpass);
-				}
+				char userpass[STR_MAX];
+				snprintf(userpass, STR_MAX, "%s:%s", proxy_user, proxy_pass);
+				curl_easy_setopt(curl_handle, CURLOPT_PROXYUSERPWD, userpass);
 			}
 		}
 
@@ -164,35 +148,19 @@ double getremotefilesize(CURL *curl_handle, char *uri)
 		curl_easy_setopt(curl_handle, CURLOPT_NOBODY, 1);
 		curl_easy_setopt(curl_handle, CURLOPT_HEADER, 0);
 
-		if(proxy_type != NONE)
+		if(proxy_type)
 		{
-			if(proxy_type == HTTP)
-				curl_easy_setopt(curl_handle, CURLOPT_PROXYTYPE, CURLPROXY_HTTP);
-			else if(proxy_type == SOCKS4)
-				curl_easy_setopt(curl_handle, CURLOPT_PROXYTYPE, CURLPROXY_SOCKS4);
-			else if(proxy_type == SOCKS5)
-				curl_easy_setopt(curl_handle, CURLOPT_PROXYTYPE, CURLPROXY_SOCKS5);
-
+			curl_easy_setopt(curl_handle, CURLOPT_PROXYTYPE, proxy_type);
 			curl_easy_setopt(curl_handle, CURLOPT_PROXY, proxy_addr);
-
 			if(proxy_port)
 				curl_easy_setopt(curl_handle, CURLOPT_PROXYPORT, proxy_port);
-
-			if(proxy_auth != NOAUTH)
+			if(proxy_auth)
+				curl_easy_setopt(curl_handle, CURLOPT_PROXYAUTH, proxy_auth);
+			if(proxy_user[0] && proxy_pass[0])
 			{
-				if(proxy_auth == BASIC)
-					curl_easy_setopt(curl_handle, CURLOPT_PROXYAUTH, CURLAUTH_BASIC);
-				else if(proxy_auth == DIGEST)
-					curl_easy_setopt(curl_handle, CURLOPT_PROXYAUTH, CURLAUTH_DIGEST);
-				else if(proxy_auth == NTLM)
-					curl_easy_setopt(curl_handle, CURLOPT_PROXYAUTH, CURLAUTH_NTLM);
-
-				if(proxy_user[0] && proxy_pass[0])
-				{
-					char userpass[STR_MAX];
-					snprintf(userpass, STR_MAX, "%s:%s", proxy_user, proxy_pass);
-					curl_easy_setopt(curl_handle, CURLOPT_PROXYUSERPWD, userpass);
-				}
+				char userpass[STR_MAX];
+				snprintf(userpass, STR_MAX, "%s:%s", proxy_user, proxy_pass);
+				curl_easy_setopt(curl_handle, CURLOPT_PROXYUSERPWD, userpass);
 			}
 		}
 

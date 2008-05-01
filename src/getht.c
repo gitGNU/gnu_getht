@@ -32,8 +32,8 @@
 
 int update_contents_files();
 
-proxytype proxy_type; char proxy_addr[STR_MAX]; long proxy_port;
-proxyauth proxy_auth; 
+int proxy_type; char proxy_addr[STR_MAX]; long proxy_port;
+int proxy_auth; 
 char proxy_user[STR_MAX]; char proxy_pass[STR_MAX];
 char issue_xml[STR_MAX];
 char issue_uri[STR_MAX];
@@ -67,10 +67,10 @@ int main(int argc, char *argv[])
 	int force = 0, update = 0;
 	int verbose = 0, option = 0;
 
-	proxy_type = NONE;
+	proxy_type = 0;
 	proxy_port = 0;
 	proxy_addr[0] = '\0';
-	proxy_auth = NOAUTH;
+	proxy_auth = 0;
 	proxy_user[0] = '\0';
 	proxy_pass[0] = '\0';
 

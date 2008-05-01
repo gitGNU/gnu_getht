@@ -27,18 +27,5 @@
 
 #define STR_MAX		512
 
-typedef enum
-{
-	NONE,
-	HTTP,
-	SOCKS4,
-	SOCKS5
-} proxytype;
-
-typedef enum
-{
-	NOAUTH,
-	BASIC,
-	DIGEST,
-	NTLM,
-} proxyauth;
+char * proxytype;
+char * proxyauth;

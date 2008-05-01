@@ -23,10 +23,12 @@
 
 #include "getht.h"
 
-extern proxytype proxy_type;
+#include <curl/curl.h>
+
+extern int proxy_type;
 extern char proxy_addr[STR_MAX];
 extern long proxy_port;
-extern proxyauth proxy_auth;
+extern int proxy_auth;
 extern char proxy_user[STR_MAX];
 extern char proxy_pass[STR_MAX];
 extern char issue_uri[STR_MAX];
@@ -61,11 +63,11 @@ int loadconfig(char * htde_path, char * issue_path, int * update)
 		else if(!strcmp(option, "proxy_type"))
 		{
 			if(!strcmp(parameter, "http"))
-				proxy_type = HTTP;
+				proxy_type = CURLPROXY_HTTP;
 			else if(!strcmp(parameter, "socks4"))
-				proxy_type = SOCKS4;
+				proxy_type = CURLPROXY_SOCKS4;
 			else if(!strcmp(parameter, "socks5"))
-				proxy_type = SOCKS5;
+				proxy_type = CURLPROXY_SOCKS5;
 			else
 				fprintf(stderr,
 					"Proxy type %s not known, please use either http, socks4 or socks5\n",
@@ -78,11 +80,11 @@ int loadconfig(char * htde_path, char * issue_path, int * update)
 		else if(!strcmp(option, "proxy_auth"))
 		{
 			if(!strcmp(parameter, "basic"))
-				proxy_auth = BASIC;
+				proxy_auth = CURLAUTH_BASIC;
 			else if(!strcmp(parameter, "digest"))
-				proxy_auth = DIGEST;
+				proxy_auth = CURLAUTH_DIGEST;
 			else if(!strcmp(parameter, "ntlm"))
-				proxy_auth = NTLM;
+				proxy_auth = CURLAUTH_NTLM;
 			else
 				fprintf(stderr,
 					"Proxy authentication method %s not known, please use basic, digest or ntlm",
@@ -121,26 +123,26 @@ int writefreshconfig(char * htde_path, char * issue_path, int * update)
 		fprintf(config_file, "%s = %i\n", "startup_check", *update);
 	if(issue_uri[0])
 		fprintf(config_file, "%s = %s\n", "toc_uri", issue_uri);
-	if(proxy_type != NONE)
+	if(proxy_type)
 	{
-		if(proxy_type = HTTP)
+		if(proxy_type == CURLPROXY_HTTP)
 			fprintf(config_file, "%s = %s\n", "proxy_type", "http");
-		else if(proxy_type = SOCKS4)
+		else if(proxy_type == CURLPROXY_SOCKS4)
 			fprintf(config_file, "%s = %s\n", "proxy_type", "socks4");
-		else if(proxy_type = SOCKS5)
+		else if(proxy_type == CURLPROXY_SOCKS5)
 			fprintf(config_file, "%s = %s\n", "proxy_type", "socks5");
 	}
 	if(proxy_addr[0])
 		fprintf(config_file, "%s = %s\n", "proxy_address", proxy_addr);
 	if(proxy_port)
 		fprintf(config_file, "%s = %i\n", "proxy_port", proxy_port);
-	if(proxy_auth != NOAUTH)
+	if(proxy_auth)
 	{
-		if(proxy_auth = BASIC)
+		if(proxy_auth = CURLAUTH_BASIC)
 			fprintf(config_file, "%s = %s\n", "proxy_auth", "basic");
-		else if(proxy_auth = DIGEST)
+		else if(proxy_auth = CURLAUTH_DIGEST)
 			fprintf(config_file, "%s = %s\n", "proxy_auth", "digest");
-		else if(proxy_auth = NTLM)
+		else if(proxy_auth = CURLAUTH_NTLM)
 			fprintf(config_file, "%s = %s\n", "proxy_auth", "ntlm");
 	}
 	if(proxy_user[0])
