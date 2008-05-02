@@ -43,17 +43,18 @@ extern char proxy_user[STR_MAX];
 extern char proxy_pass[STR_MAX];
 extern CURL *main_curl_handle;
 
-int save_file(CURL *curl_handle, char *uri, char *filepath, long resume_offset)
+int save_file(CURL *curl_handle, char *uri, char *filepath, char *filetitle, long resume_offset)
 /*	Save the file *uri to *filepath */
 {
-	printf("Downloading %s\n",uri);
+	printf("Downloading %s       ",filetitle);
+	fflush(stdout);
 
 	if(!curl_handle)
 		curl_handle = main_curl_handle;
 
 	if(curl_handle) {
 		FILE *file;
-		file = fopen(filepath, "a");
+		file = fopen(filepath, resume_offset?"a":"w");
 		if(!file)
 		{
 			fprintf(stderr,"Error: cannot open file %s for writing.\n",filepath);
@@ -100,7 +101,7 @@ int save_file(CURL *curl_handle, char *uri, char *filepath, long resume_offset)
 
 		fclose(file);
 
-		printf("\n");
+		printf("\rDownloaded %s       \n",filetitle);
 	}
 	else {
 		fprintf(stderr,"Error: curl failed to initialise.\n");
@@ -126,7 +127,7 @@ int update_progress(void *data, double dltotal, double dlnow,
 	else
 		frac = 0;
 
-	printf("\rDownload progress: %3.0lf%% ", frac);
+	printf("\b\b\b\b\b\b\b: %3.0lf%% ", frac);
 	fflush(stdout);
 
 	return 0;
@@ -185,12 +186,12 @@ void downloadissue(CURL *curl_handle, char * directory, iss * issue, int force)
 	sec * cur_section;
 	char newdir[STR_MAX];
 	char filename[STR_MAX];
-	FILE * testfile;
+	char filepath[STR_MAX];
 
 	snprintf(newdir,STR_MAX,"%s/%i_%i-%i",directory,
 		issue->date.year,issue->date.firstmonth,issue->date.lastmonth);
 
-	printf("Downloading issue entitled '%s' to '%s'\n",issue->title,newdir);
+	printf("Downloading %s to %s\n",issue->title, newdir);
 
 	if(!opendir(newdir))
 		if(mkdir(newdir, S_IRWXU | S_IRGRP | S_IXGRP | S_IROTH | S_IXOTH))
@@ -204,12 +205,13 @@ void downloadissue(CURL *curl_handle, char * directory, iss * issue, int force)
 	{
 		cur_section = issue->section[count];
 
-		snprintf(filename,STR_MAX,"%s/section_%i.pdf", newdir, cur_section->number);
+		snprintf(filename,STR_MAX,"section_%i.pdf", cur_section->number);
+		snprintf(filepath,STR_MAX,"%s/%s", newdir, filename);
 		if(!force){
 			struct stat fileinfo;
 			/* see if local file exists */
-			if(stat(filename, &fileinfo))
-				save_file(curl_handle, cur_section->uri, filename, 0);
+			if(stat(filepath, &fileinfo))
+				save_file(curl_handle, cur_section->uri, filepath, filename, 0);
 			else
 			{
 				/* get size of local file */
@@ -222,12 +224,12 @@ void downloadissue(CURL *curl_handle, char * directory, iss * issue, int force)
 
 				/* if size of local file != size of remote file, resume */
 				if(remotesize > 0 && localsize < remotesize)
-					save_file(curl_handle, cur_section->uri, filename, localsize);
+					save_file(curl_handle, cur_section->uri, filepath, filename, localsize);
 				else
 					printf("Skipping download of completed section %i\n", cur_section->number);
 			}
 		}
 		else
-			save_file(curl_handle, cur_section->uri, filename, 0);
+			save_file(curl_handle, cur_section->uri, filepath, filename, 0);
 	}
 }
