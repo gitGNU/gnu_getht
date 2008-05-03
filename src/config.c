@@ -33,7 +33,7 @@ extern char proxy_user[STR_MAX];
 extern char proxy_pass[STR_MAX];
 extern char issue_uri[STR_MAX];
 
-int loadconfig(char * htde_path, char * issue_path, int * update)
+int loadconfig(char * htde_path, char * save_path, int * update)
 /*	Loads variables from config file to extern and passed
  *	variables. */
 {
@@ -54,8 +54,8 @@ int loadconfig(char * htde_path, char * issue_path, int * update)
 		fscanf(config_file, "%s = %s", option, parameter);
 
 		if(option[0] == '#');	/* ignore lines beginning with a hash */
-		else if(!strcmp(option, "issuepath"))
-			strncpy(issue_path, parameter, STR_MAX);
+		else if(!strcmp(option, "savepath"))
+			strncpy(save_path, parameter, STR_MAX);
 		else if(!strcmp(option, "startup_check"))
 			*update = atoi(parameter);
 		else if(!strcmp(option, "toc_uri"))
@@ -101,7 +101,7 @@ int loadconfig(char * htde_path, char * issue_path, int * update)
 	return 0;
 }
 
-int writefreshconfig(char * htde_path, char * issue_path, int * update)
+int writefreshconfig(char * htde_path, char * save_path, int * update)
 /*	Write a new config file according to extern and passed variables. */
 {
 	FILE * config_file;
@@ -117,8 +117,8 @@ int writefreshconfig(char * htde_path, char * issue_path, int * update)
 	else
 		fprintf(stdout,"Writing a fresh config file to %s.\n",filepath);
 
-	if(issue_path[0])
-		fprintf(config_file, "%s = %s\n", "issuepath", issue_path);
+	if(save_path[0])
+		fprintf(config_file, "%s = %s\n", "savepath", save_path);
 	if(update)
 		fprintf(config_file, "%s = %i\n", "startup_check", *update);
 	if(issue_uri[0])
@@ -153,7 +153,7 @@ int writefreshconfig(char * htde_path, char * issue_path, int * update)
 	return 0;
 }
 
-int updateconfig(char * htde_path, char * issue_path, int * update)
+int updateconfig(char * htde_path, char * save_path, int * update)
 /*	Read existing config file, and rewrite any variables which differ
  *	in memory. */
 {

@@ -83,7 +83,7 @@ with commented lines starting with a #
 
 The following options may be set.
 .TP
-.B issuepath
+.B savepath
 Stores the path in which all issues will be saved
 The default setting is \fB~/hinduism_today/\fR
 .TP

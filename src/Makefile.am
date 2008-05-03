@@ -4,4 +4,4 @@ bin_PROGRAMS = getht
 
 getht_SOURCES = config.c cli.c download.c getht.c issuemem.c	\
 		tocxml.c xml.c	\
-		getht.h issue.h version.h
+		config.h getht.h issue.h version.h

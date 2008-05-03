@@ -26,6 +26,3 @@
 #define ISS_XML_FILE	"htde_toc.xml"
 
 #define STR_MAX		512
-
-char * proxytype;
-char * proxyauth;

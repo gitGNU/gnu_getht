@@ -35,7 +35,7 @@ int update_contents_files();
 int proxy_type; char proxy_addr[STR_MAX]; long proxy_port;
 int proxy_auth; 
 char proxy_user[STR_MAX]; char proxy_pass[STR_MAX];
-char issue_xml[STR_MAX];
+char toc_xml[STR_MAX];
 char issue_uri[STR_MAX];
 CURL *main_curl_handle;
 
@@ -55,7 +55,7 @@ int main(int argc, char *argv[])
 			scanf("%s", getht_path);
 		}
 
-	snprintf(issue_xml,STR_MAX,"%s/%s",getht_path,ISS_XML_FILE);
+	snprintf(toc_xml,STR_MAX,"%s/%s",getht_path,ISS_XML_FILE);
 
 	strncpy(issue_uri,XML_TOC_URI,STR_MAX);
 
@@ -163,7 +163,7 @@ int main(int argc, char *argv[])
 
 	if(downissue || listissues)
 	{
-		issue = parsetoc(issue_xml, &no_of_issues);
+		issue = parsetoc(toc_xml, &no_of_issues);
 
 		if(!issue)
 		{
@@ -172,7 +172,7 @@ int main(int argc, char *argv[])
 				printf("Cannot open contents file, trying to update contents\n");
 				if(update_contents_files())
 					return 1;
-				issue = parsetoc(issue_xml, &no_of_issues);
+				issue = parsetoc(toc_xml, &no_of_issues);
 			}
 			else
 			{
@@ -203,7 +203,7 @@ int main(int argc, char *argv[])
 int update_contents_files()
 /* Returns 0 on success, 1 on failure */
 {
-	if(save_file(NULL, issue_uri, issue_xml, "contents", 0))
+	if(save_file(NULL, issue_uri, toc_xml, "contents", 0))
 		return 1;
 	else
 		return 0;
