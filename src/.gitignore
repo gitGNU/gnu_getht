@@ -1,0 +1,5 @@
+# ignore autotools creations
+.deps
+
+# ignore built binary
+getht
