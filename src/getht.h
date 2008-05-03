@@ -26,3 +26,23 @@
 #define ISS_XML_FILE	"htde_toc.xml"
 
 #define STR_MAX		512
+
+#include <curl/curl.h>
+
+struct config {
+	char * proxytype;
+	char * proxyauth;
+	char proxy_addr[STR_MAX];
+	long proxy_port;
+	char proxy_user[STR_MAX];
+	char proxy_pass[STR_MAX];
+
+	char toc_xml[STR_MAX];
+	char issue_uri[STR_MAX];
+
+	char save_path[STR_MAX];
+
+	int startup_check;
+
+	CURL *curl_handle;
+};
