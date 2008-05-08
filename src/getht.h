@@ -26,20 +26,26 @@
 
 #include <curl/curl.h>
 
-struct config {
-	char * proxytype;
-	char * proxyauth;
-	char proxy_addr[STR_MAX];
-	long proxy_port;
-	char proxy_user[STR_MAX];
-	char proxy_pass[STR_MAX];
+struct proxy_options {
+	char type;
+	char auth;
+	char address[STR_MAX];
+	long port;
+	char user[STR_MAX];
+	char pass[STR_MAX];
+};
 
+struct config {
 	char toc_xml[STR_MAX];
 	char issue_uri[STR_MAX];
 
 	char save_path[STR_MAX];
 
+	struct proxy_options proxy;
+
 	int startup_check;
+
+	int verbose;
 
 	CURL *curl_handle;
 };

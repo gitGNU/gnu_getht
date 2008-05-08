@@ -30,19 +30,22 @@
 #include "issue.h"
 #include "getht.h"
 
-int update_contents_files();
-
-int proxy_type; char proxy_addr[STR_MAX]; long proxy_port;
-int proxy_auth; 
-char proxy_user[STR_MAX]; char proxy_pass[STR_MAX];
-char toc_xml[STR_MAX];
-char issue_uri[STR_MAX];
-CURL *main_curl_handle;
+int update_contents_files(struct config * options);
 
 int main(int argc, char *argv[])
 {
+	struct config options;
 	char getht_path[STR_MAX];
-	char save_path[STR_MAX];
+
+	/* initialise appropriate options vars */
+	options.startup_check = 0;
+	options.verbose = 0;
+	options.proxy.type = 0;
+	options.proxy.auth = 0;
+	options.proxy.address[0] = '\0';
+	options.proxy.port = 0;
+	options.proxy.user[0] = '\0';
+	options.proxy.pass[0] = '\0';
 
 	/* Define & set up paths */
 	snprintf(getht_path,STR_MAX,"%s/.getht",getenv("HOME"));
@@ -55,36 +58,29 @@ int main(int argc, char *argv[])
 			scanf("%s", getht_path);
 		}
 
-	snprintf(toc_xml,STR_MAX,"%s/%s",getht_path,ISS_XML_FILE);
+	snprintf(options.toc_xml,STR_MAX,"%s/%s",getht_path,ISS_XML_FILE);
 
-	strncpy(issue_uri,XML_TOC_URI,STR_MAX);
+	strncpy(options.issue_uri,XML_TOC_URI,STR_MAX);
 
-	snprintf(save_path,STR_MAX,"%s/hinduism_today",getenv("HOME"));
+	snprintf(options.save_path,STR_MAX,"%s/hinduism_today",getenv("HOME"));
 
 	int downall = 0;
 	int downissue = 0, downissueno = -1;
 	int listissues = 0;
-	int force = 0, update = 0;
-	int verbose = 0, option = 0;
+	int force = 0;
+	int option = 0;
 
-	proxy_type = 0;
-	proxy_port = 0;
-	proxy_addr[0] = '\0';
-	proxy_auth = 0;
-	proxy_user[0] = '\0';
-	proxy_pass[0] = '\0';
+	if(loadconfig(getht_path, &options) != 0)
+		writefreshconfig(getht_path, &options);
 
-	if(loadconfig(getht_path, &save_path, &update) != 0)
-		writefreshconfig(getht_path, &save_path, &update, &issue_uri);
-
-	if(!opendir(save_path))
-		if(mkdir(save_path, S_IRWXU | S_IRGRP | S_IXGRP | S_IROTH | S_IXOTH))
+	if(!opendir(options.save_path))
+		if(mkdir(options.save_path, S_IRWXU | S_IRGRP | S_IXGRP | S_IROTH | S_IXOTH))
 		{
-			fprintf(stderr,"Cannot open/create directory %s",save_path);
+			fprintf(stderr,"Cannot open/create directory %s",options.save_path);
 			printf("Please enter the path of a directory to save issues in: ");
-			scanf("%s", save_path);
+			scanf("%s", options.save_path);
 
-			updateconfig(getht_path, &save_path, NULL);
+			updateconfig(getht_path, &options);
 		}
 
 	/* Parse command line options */
@@ -122,7 +118,7 @@ int main(int argc, char *argv[])
 				option = 1;
 				break;
 			case 'u':
-				update = 1;
+				options.startup_check = 1;
 				option = 1;
 				break;
 			case 'h':
@@ -130,7 +126,7 @@ int main(int argc, char *argv[])
 				return 0;
 				break;
 			case 'v':
-				verbose++;
+				options.verbose++;
 				option = 1;
 				break;
 			case 'V':
@@ -147,11 +143,11 @@ int main(int argc, char *argv[])
 		return 0;
 	}
 
-	main_curl_handle = curl_easy_init();
+	options.curl_handle = curl_easy_init();
 
-	if(update)
+	if(options.startup_check)
 	{
-		if(update_contents_files())
+		if(update_contents_files(&options))
 			fprintf(stderr,"Could not update contents files\n");
 	}
 
@@ -163,16 +159,16 @@ int main(int argc, char *argv[])
 
 	if(downissue || listissues)
 	{
-		issue = parsetoc(toc_xml, &no_of_issues);
+		issue = parsetoc(options.toc_xml, &no_of_issues);
 
 		if(!issue)
 		{
-			if(!update)
+			if(!options.startup_check)
 			{
 				printf("Cannot open contents file, trying to update contents\n");
-				if(update_contents_files())
+				if(update_contents_files(&options))
 					return 1;
-				issue = parsetoc(toc_xml, &no_of_issues);
+				issue = parsetoc(options.toc_xml, &no_of_issues);
 			}
 			else
 			{
@@ -184,26 +180,26 @@ int main(int argc, char *argv[])
 		if(downall)
 		{
 			for(i = 0; i < no_of_issues; i++)
-				downloadissue(NULL, save_path, issue[i], force);
+				downloadissue(&options, issue[i], force);
 		}
 		else if(downissueno >= 0 && downissueno <= no_of_issues)
-			downloadissue(NULL, save_path, issue[downissueno], force);
+			downloadissue(&options, issue[downissueno], force);
 	}
 	
 
 	if(listissues)
-		list_issues(issue, no_of_issues, verbose);
+		list_issues(issue, no_of_issues, options.verbose);
 
 	/* Ensure curl cleans itself up */
-	curl_easy_cleanup(main_curl_handle);
+	curl_easy_cleanup(options.curl_handle);
 
 	return 0;
 }
 
-int update_contents_files()
+int update_contents_files(struct config * options)
 /* Returns 0 on success, 1 on failure */
 {
-	if(save_file(NULL, issue_uri, toc_xml, "contents", 0))
+	if(save_file(options->issue_uri, options->toc_xml, "contents", 0, options))
 		return 1;
 	else
 		return 0;

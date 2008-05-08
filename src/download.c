@@ -35,24 +35,13 @@ int write_func(void *ptr, size_t size, size_t nmemb, FILE *stream)
 int update_progress(void *data, double dltotal, double dlnow,
 					double ultotal, double ulnow);
 
-extern int proxy_type;
-extern char proxy_addr[STR_MAX];
-extern long proxy_port;
-extern int proxy_auth;
-extern char proxy_user[STR_MAX];
-extern char proxy_pass[STR_MAX];
-extern CURL *main_curl_handle;
-
-int save_file(CURL *curl_handle, char *uri, char *filepath, char *filetitle, long resume_offset)
+int save_file(char *uri, char *filepath, char *filetitle, long resume_offset, struct config * options)
 /*	Save the file *uri to *filepath */
 {
 	printf("Downloading %s       ",filetitle);
 	fflush(stdout);
 
-	if(!curl_handle)
-		curl_handle = main_curl_handle;
-
-	if(curl_handle) {
+	if(options->curl_handle) {
 		FILE *file;
 		file = fopen(filepath, resume_offset?"a":"w");
 		if(!file)
@@ -61,38 +50,38 @@ int save_file(CURL *curl_handle, char *uri, char *filepath, char *filetitle, lon
 			return 1;
 		}
 
-		curl_easy_setopt(curl_handle, CURLOPT_URL, uri);
-		curl_easy_setopt(curl_handle, CURLOPT_READFUNCTION, read_func);
-		curl_easy_setopt(curl_handle, CURLOPT_WRITEFUNCTION, write_func);
-		curl_easy_setopt(curl_handle, CURLOPT_WRITEDATA, file);
+		curl_easy_setopt(options->curl_handle, CURLOPT_URL, uri);
+		curl_easy_setopt(options->curl_handle, CURLOPT_READFUNCTION, read_func);
+		curl_easy_setopt(options->curl_handle, CURLOPT_WRITEFUNCTION, write_func);
+		curl_easy_setopt(options->curl_handle, CURLOPT_WRITEDATA, file);
 
-		if(proxy_type)
+		if(options->proxy.type)
 		{
-			curl_easy_setopt(curl_handle, CURLOPT_PROXYTYPE, proxy_type);
-			curl_easy_setopt(curl_handle, CURLOPT_PROXY, proxy_addr);
-			if(proxy_port)
-				curl_easy_setopt(curl_handle, CURLOPT_PROXYPORT, proxy_port);
-			if(proxy_auth)
-				curl_easy_setopt(curl_handle, CURLOPT_PROXYAUTH, proxy_auth);
-			if(proxy_user[0] && proxy_pass[0])
+			curl_easy_setopt(options->curl_handle, CURLOPT_PROXYTYPE, options->proxy.type);
+			curl_easy_setopt(options->curl_handle, CURLOPT_PROXY, options->proxy.address);
+			if(options->proxy.port)
+				curl_easy_setopt(options->curl_handle, CURLOPT_PROXYPORT, options->proxy.port);
+			if(options->proxy.auth)
+				curl_easy_setopt(options->curl_handle, CURLOPT_PROXYAUTH, options->proxy.auth);
+			if(options->proxy.user[0] && options->proxy.pass[0])
 			{
 				char userpass[STR_MAX];
-				snprintf(userpass, STR_MAX, "%s:%s", proxy_user, proxy_pass);
-				curl_easy_setopt(curl_handle, CURLOPT_PROXYUSERPWD, userpass);
+				snprintf(userpass, STR_MAX, "%s:%s", options->proxy.user, options->proxy.pass);
+				curl_easy_setopt(options->curl_handle, CURLOPT_PROXYUSERPWD, userpass);
 			}
 		}
 
-		curl_easy_setopt(curl_handle, CURLOPT_NOPROGRESS, 0);
-		curl_easy_setopt(curl_handle, CURLOPT_PROGRESSFUNCTION, update_progress);
-		curl_easy_setopt(curl_handle, CURLOPT_PROGRESSDATA, &resume_offset);
+		curl_easy_setopt(options->curl_handle, CURLOPT_NOPROGRESS, 0);
+		curl_easy_setopt(options->curl_handle, CURLOPT_PROGRESSFUNCTION, update_progress);
+		curl_easy_setopt(options->curl_handle, CURLOPT_PROGRESSDATA, &resume_offset);
 
-		curl_easy_setopt(curl_handle, CURLOPT_RESUME_FROM, resume_offset);
+		curl_easy_setopt(options->curl_handle, CURLOPT_RESUME_FROM, resume_offset);
 
 		/* create a buffer to hold any curl errors */
 		char errorinfo[CURL_ERROR_SIZE];
-		curl_easy_setopt(curl_handle, CURLOPT_ERRORBUFFER, errorinfo);
+		curl_easy_setopt(options->curl_handle, CURLOPT_ERRORBUFFER, errorinfo);
 
-		if(curl_easy_perform(curl_handle))
+		if(curl_easy_perform(options->curl_handle))
 		{
 			remove(filepath);
 			fprintf(stderr,"\nError, could not download %s: %s\n",uri, errorinfo);
@@ -133,54 +122,51 @@ int update_progress(void *data, double dltotal, double dlnow,
 	return 0;
 }
 
-double getremotefilesize(CURL *curl_handle, char *uri)
+double getremotefilesize(char *uri, struct config * options)
 {
 	double filesize;
 
-	if(!curl_handle)
-		curl_handle = main_curl_handle;
+	if(options->curl_handle) {
 
-	if(curl_handle) {
-
-		curl_easy_setopt(curl_handle, CURLOPT_URL, uri);
-		curl_easy_setopt(curl_handle, CURLOPT_READFUNCTION, read_func);
+		curl_easy_setopt(options->curl_handle, CURLOPT_URL, uri);
+		curl_easy_setopt(options->curl_handle, CURLOPT_READFUNCTION, read_func);
 
 		/* don't download or return either body or header */
-		curl_easy_setopt(curl_handle, CURLOPT_NOBODY, 1);
-		curl_easy_setopt(curl_handle, CURLOPT_HEADER, 0);
+		curl_easy_setopt(options->curl_handle, CURLOPT_NOBODY, 1);
+		curl_easy_setopt(options->curl_handle, CURLOPT_HEADER, 0);
 
-		if(proxy_type)
+		if(options->proxy.type)
 		{
-			curl_easy_setopt(curl_handle, CURLOPT_PROXYTYPE, proxy_type);
-			curl_easy_setopt(curl_handle, CURLOPT_PROXY, proxy_addr);
-			if(proxy_port)
-				curl_easy_setopt(curl_handle, CURLOPT_PROXYPORT, proxy_port);
-			if(proxy_auth)
-				curl_easy_setopt(curl_handle, CURLOPT_PROXYAUTH, proxy_auth);
-			if(proxy_user[0] && proxy_pass[0])
+			curl_easy_setopt(options->curl_handle, CURLOPT_PROXYTYPE, options->proxy.type);
+			curl_easy_setopt(options->curl_handle, CURLOPT_PROXY, options->proxy.address);
+			if(options->proxy.port)
+				curl_easy_setopt(options->curl_handle, CURLOPT_PROXYPORT, options->proxy.port);
+			if(options->proxy.auth)
+				curl_easy_setopt(options->curl_handle, CURLOPT_PROXYAUTH, options->proxy.auth);
+			if(options->proxy.user[0] && options->proxy.pass[0])
 			{
 				char userpass[STR_MAX];
-				snprintf(userpass, STR_MAX, "%s:%s", proxy_user, proxy_pass);
-				curl_easy_setopt(curl_handle, CURLOPT_PROXYUSERPWD, userpass);
+				snprintf(userpass, STR_MAX, "%s:%s", options->proxy.user, options->proxy.pass);
+				curl_easy_setopt(options->curl_handle, CURLOPT_PROXYUSERPWD, userpass);
 			}
 		}
 
-		curl_easy_setopt(curl_handle, CURLOPT_NOPROGRESS, 1);
+		curl_easy_setopt(options->curl_handle, CURLOPT_NOPROGRESS, 1);
 
-		if(curl_easy_perform(curl_handle))
+		if(curl_easy_perform(options->curl_handle))
 			filesize = -1;
 
-		curl_easy_getinfo(curl_handle, CURLINFO_CONTENT_LENGTH_DOWNLOAD, &filesize);
+		curl_easy_getinfo(options->curl_handle, CURLINFO_CONTENT_LENGTH_DOWNLOAD, &filesize);
 
 	}
 	else
 		filesize = -1;
 
-	curl_easy_reset(curl_handle);
+	curl_easy_reset(options->curl_handle);
 	return filesize;
 }
 
-void downloadissue(CURL *curl_handle, char * directory, iss * issue, int force)
+void downloadissue(struct config * options, iss * issue, int force)
 /*	Download issue pointed to */
 {
 	sec * cur_section;
@@ -188,7 +174,7 @@ void downloadissue(CURL *curl_handle, char * directory, iss * issue, int force)
 	char filename[STR_MAX];
 	char filepath[STR_MAX];
 
-	snprintf(newdir,STR_MAX,"%s/%i_%i-%i",directory,
+	snprintf(newdir,STR_MAX,"%s/%i_%i-%i",options->save_path,
 		issue->date.year,issue->date.firstmonth,issue->date.lastmonth);
 
 	printf("Downloading %s to %s\n",issue->title, newdir);
@@ -211,7 +197,7 @@ void downloadissue(CURL *curl_handle, char * directory, iss * issue, int force)
 			struct stat fileinfo;
 			/* see if local file exists */
 			if(stat(filepath, &fileinfo))
-				save_file(curl_handle, cur_section->uri, filepath, filename, 0);
+				save_file(cur_section->uri, filepath, filename, 0, options);
 			else
 			{
 				/* get size of local file */
@@ -220,16 +206,16 @@ void downloadissue(CURL *curl_handle, char * directory, iss * issue, int force)
 
 				/* get size of remote file */
 				long remotesize = 0;
-				remotesize = (long) getremotefilesize(curl_handle, cur_section->uri);
+				remotesize = (long) getremotefilesize(cur_section->uri, options);
 
 				/* if size of local file != size of remote file, resume */
 				if(remotesize > 0 && localsize < remotesize)
-					save_file(curl_handle, cur_section->uri, filepath, filename, localsize);
+					save_file(cur_section->uri, filepath, filename, localsize, options);
 				else
 					printf("Skipping download of completed section %i\n", cur_section->number);
 			}
 		}
 		else
-			save_file(curl_handle, cur_section->uri, filepath, filename, 0);
+			save_file(cur_section->uri, filepath, filename, 0, options);
 	}
 }
