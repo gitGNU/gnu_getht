@@ -15,9 +15,6 @@ AC_PROG_INSTALL
 
 # Checks for libraries.
 
-dnl check for zlib
-CHECK_ZLIB()
-
 dnl check for libxml2
 AM_PATH_XML2([2.0.0])
 CFLAGS="$CFLAGS $XML_CPPFLAGS"

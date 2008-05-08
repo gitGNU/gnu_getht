@@ -20,7 +20,7 @@ and redistribute it however you see fit, provided you extend the same
 freedom to others by releasing derivatives with the same license.
 
 -Dependancies
-libxml2 2.0.0+  Compiled with zlib support
+libxml2 2.0.0+
 libcurl 7.7.2+
 
 -Install
