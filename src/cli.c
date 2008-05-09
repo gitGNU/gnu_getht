@@ -29,24 +29,23 @@ void list_issues(iss ** issue, int no_of_issues, int verbose)
 	int iss_no, sec_no, it_no;
 	for(iss_no=0;iss_no<=no_of_issues;iss_no++)
 	{
-		printf("[%i]\t", iss_no);
-		printf("%s\n", issue[iss_no]->title);
+		printf("%2i: %s\n", iss_no, issue[iss_no]->title);
 		if(verbose >= 2)
-			printf("Year: %i; Months: %i - %i\n",issue[iss_no]->date.year,issue[iss_no]->date.firstmonth,issue[iss_no]->date.lastmonth);
+			printf("    Year: %i; Months: %i - %i\n",issue[iss_no]->date.year,issue[iss_no]->date.firstmonth,issue[iss_no]->date.lastmonth);
 		if(verbose >= 1)
 		{
 			for(sec_no=0; sec_no<=issue[iss_no]->no_of_sections; sec_no++)
 			{
-				printf("\t%i: %s\n", issue[iss_no]->section[sec_no]->number,
+				printf("   %2i: %s\n", issue[iss_no]->section[sec_no]->number,
 					issue[iss_no]->section[sec_no]->title);
-				printf("\t%s\n", issue[iss_no]->section[sec_no]->uri);
+				printf("       %s\n", issue[iss_no]->section[sec_no]->uri);
 				if(verbose >= 2)
 				{
 					for(it_no=0;
 						it_no<=issue[iss_no]->section[sec_no]->no_of_items;
 						it_no++)
 					{
-						printf("\t\tpp %i - %i: %s\n",
+						printf("         pp %2i - %2i: %s\n",
 							issue[iss_no]->section[sec_no]->item[it_no]->firstpage,
 							issue[iss_no]->section[sec_no]->item[it_no]->lastpage,
 							issue[iss_no]->section[sec_no]->item[it_no]->title);
