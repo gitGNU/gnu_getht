@@ -39,6 +39,7 @@ int main(int argc, char *argv[])
 
 	/* initialise appropriate options vars */
 	options.startup_check = 0;
+	options.quiet = 0;
 	options.verbose = 0;
 	options.proxy.type = 0;
 	options.proxy.auth = 0;
@@ -91,13 +92,14 @@ int main(int argc, char *argv[])
 		{"download-issue", required_argument, 0, 'd'},
 		{"force", no_argument, 0, 'f'},
 		{"list-issues", no_argument, 0, 'l'},
+		{"quiet", no_argument, 0, 'q'},
 		{"update", no_argument, 0, 'u'},
 		{"help", no_argument, 0, 'h'},
 		{"verbose", no_argument, 0, 'v'},
 		{"version", no_argument, 0, 'V'},
 		{0, 0, 0, 0}
 	};
-	while((c = getopt_long(argc, argv, "ad:fhlmn:osuvVx:t:", long_opts, NULL)) != -1) {
+	while((c = getopt_long(argc, argv, "ad:fhluqvV", long_opts, NULL)) != -1) {
 		switch(c) {
 			case 'a':
 				downall = 1;
@@ -124,6 +126,10 @@ int main(int argc, char *argv[])
 			case 'h':
 				showusage();
 				return 0;
+				break;
+			case 'q':
+				options.quiet = 1;
+				option = 1;
 				break;
 			case 'v':
 				options.verbose++;

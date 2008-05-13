@@ -38,8 +38,11 @@ int update_progress(void *data, double dltotal, double dlnow,
 int save_file(char *uri, char *filepath, char *filetitle, long resume_offset, struct config * options)
 /*	Save the file *uri to *filepath */
 {
-	printf("Downloading %s       ",filetitle);
-	fflush(stdout);
+	if(!options->quiet)
+	{
+		printf("Downloading %s       ",filetitle);
+		fflush(stdout);
+	}
 
 	if(options->curl_handle) {
 		FILE *file;
@@ -71,9 +74,14 @@ int save_file(char *uri, char *filepath, char *filetitle, long resume_offset, st
 			}
 		}
 
-		curl_easy_setopt(options->curl_handle, CURLOPT_NOPROGRESS, 0);
-		curl_easy_setopt(options->curl_handle, CURLOPT_PROGRESSFUNCTION, update_progress);
-		curl_easy_setopt(options->curl_handle, CURLOPT_PROGRESSDATA, &resume_offset);
+		if(!options->quiet)
+		{
+			curl_easy_setopt(options->curl_handle, CURLOPT_NOPROGRESS, 0);
+			curl_easy_setopt(options->curl_handle, CURLOPT_PROGRESSFUNCTION, update_progress);
+			curl_easy_setopt(options->curl_handle, CURLOPT_PROGRESSDATA, &resume_offset);
+		}
+		else
+			curl_easy_setopt(options->curl_handle, CURLOPT_NOPROGRESS, 1);
 
 		curl_easy_setopt(options->curl_handle, CURLOPT_RESUME_FROM, resume_offset);
 
@@ -90,7 +98,8 @@ int save_file(char *uri, char *filepath, char *filetitle, long resume_offset, st
 
 		fclose(file);
 
-		printf("\rDownloaded %s       \n",filetitle);
+		if(!options->quiet)
+			printf("\rDownloaded %s       \n",filetitle);
 	}
 	else {
 		fprintf(stderr,"Error: curl failed to initialise.\n");
@@ -212,7 +221,10 @@ void downloadissue(struct config * options, iss * issue, int force)
 				if(remotesize > 0 && localsize < remotesize)
 					save_file(cur_section->uri, filepath, filename, localsize, options);
 				else
-					printf("Skipping download of completed section %i\n", cur_section->number);
+				{
+					if(!options->quiet)
+						printf("Skipping download of completed section %i\n", cur_section->number);
+				}
 			}
 		}
 		else

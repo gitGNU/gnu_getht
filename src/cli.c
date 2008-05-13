@@ -65,6 +65,7 @@ void showusage()
 	printf("-d | --download-issue issno   Download issue number issno\n");
 	printf("-f | --force                  Force re-download of existing files\n");
 	printf("-h | --help                   Print this help message\n");
+	printf("-q | --quiet                  Make output less verbose\n");
 	printf("-v | --verbose                Make output more verbose\n");
 	printf("-V | --version                Print version information\n");
 }

@@ -46,6 +46,7 @@ struct config {
 	int startup_check;
 
 	int verbose;
+	int quiet;
 
 	CURL *curl_handle;
 };
