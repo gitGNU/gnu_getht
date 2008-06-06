@@ -175,18 +175,15 @@ double getremotefilesize(char *uri, struct config * options)
 	return filesize;
 }
 
-void downloadissue(struct config * options, iss * issue, int force)
-/*	Download issue pointed to */
+char * getissuedir(struct config * options, iss * issue)
+/*	Returns and prepares download directory */
 {
-	sec * cur_section;
-	char newdir[STR_MAX];
-	char filename[STR_MAX];
-	char filepath[STR_MAX];
+	char * newdir;
+
+	newdir = malloc(STR_MAX);
 
 	snprintf(newdir,STR_MAX,"%s/%i_%i-%i",options->save_path,
 		issue->date.year,issue->date.firstmonth,issue->date.lastmonth);
-
-	printf("Downloading %s to %s\n",issue->title, newdir);
 
 	if(!opendir(newdir))
 		if(mkdir(newdir, S_IRWXU | S_IRGRP | S_IXGRP | S_IROTH | S_IXOTH))
@@ -195,39 +192,56 @@ void downloadissue(struct config * options, iss * issue, int force)
 			scanf("%s", newdir);
 		}
 
-	int count;
-	for(count = 0; count <= issue->no_of_sections; count++)
-	{
-		cur_section = issue->section[count];
+	return newdir;
+}
 
-		snprintf(filename,STR_MAX,"section_%i.pdf", cur_section->number);
-		snprintf(filepath,STR_MAX,"%s/%s", newdir, filename);
-		if(!force){
-			struct stat fileinfo;
-			/* see if local file exists */
-			if(stat(filepath, &fileinfo))
-				save_file(cur_section->uri, filepath, filename, 0, options);
+void downloadsection(struct config * options, sec * section, char * downdir, int force)
+/*	Download section pointed to */
+{
+	char filename[STR_MAX];
+	char filepath[STR_MAX];
+
+	snprintf(filename,STR_MAX,"section_%i.pdf", section->number);
+	snprintf(filepath,STR_MAX,"%s/%s", downdir, filename);
+
+	if(!force){
+		struct stat fileinfo;
+		/* see if local file exists */
+		if(stat(filepath, &fileinfo))
+			save_file(section->uri, filepath, filename, 0, options);
+		else
+		{
+			/* get size of local file */
+			long localsize = 0;
+			localsize = (long) fileinfo.st_size;
+
+			/* get size of remote file */
+			long remotesize = 0;
+			remotesize = (long) getremotefilesize(section->uri, options);
+
+			/* if size of local file != size of remote file, resume */
+			if(remotesize > 0 && localsize < remotesize)
+				save_file(section->uri, filepath, filename, localsize, options);
 			else
 			{
-				/* get size of local file */
-				long localsize = 0;
-				localsize = (long) fileinfo.st_size;
-
-				/* get size of remote file */
-				long remotesize = 0;
-				remotesize = (long) getremotefilesize(cur_section->uri, options);
-
-				/* if size of local file != size of remote file, resume */
-				if(remotesize > 0 && localsize < remotesize)
-					save_file(cur_section->uri, filepath, filename, localsize, options);
-				else
-				{
-					if(!options->quiet)
-						printf("Skipping download of completed section %i\n", cur_section->number);
-				}
+				if(!options->quiet)
+					printf("Skipping download of completed section %i\n", section->number);
 			}
 		}
-		else
-			save_file(cur_section->uri, filepath, filename, 0, options);
 	}
+	else
+		save_file(section->uri, filepath, filename, 0, options);
+}
+
+void downloadissue(struct config * options, iss * issue, int force)
+/*	Download issue pointed to */
+{
+	char downdir[STR_MAX];
+	strncpy(downdir, getissuedir(options, issue), STR_MAX);
+
+	printf("Downloading %s to %s\n",issue->title, downdir);
+
+	int count;
+	for(count = 0; count <= issue->no_of_sections; count++)
+		downloadsection(options, issue->section[count], downdir, force);
 }

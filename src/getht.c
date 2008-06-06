@@ -67,6 +67,7 @@ int main(int argc, char *argv[])
 
 	int downall = 0;
 	int downissue = 0, downissueno = -1;
+	int downsection = 0, downsectionno = -1;
 	int listissues = 0;
 	int force = 0;
 	int option = 0;
@@ -90,6 +91,7 @@ int main(int argc, char *argv[])
 	{
 		{"download-all", no_argument, 0, 'a'},
 		{"download-issue", required_argument, 0, 'd'},
+		{"download-section", required_argument, 0, 's'},
 		{"force", no_argument, 0, 'f'},
 		{"list-issues", no_argument, 0, 'l'},
 		{"quiet", no_argument, 0, 'q'},
@@ -99,7 +101,7 @@ int main(int argc, char *argv[])
 		{"version", no_argument, 0, 'V'},
 		{0, 0, 0, 0}
 	};
-	while((c = getopt_long(argc, argv, "ad:fhluqvV", long_opts, NULL)) != -1) {
+	while((c = getopt_long(argc, argv, "ad:fs:hluqvV", long_opts, NULL)) != -1) {
 		switch(c) {
 			case 'a':
 				downall = 1;
@@ -109,6 +111,11 @@ int main(int argc, char *argv[])
 			case 'd':
 				downissue = 1;
 				downissueno = atoi(optarg);
+				option = 1;
+				break;
+			case 's':
+				downsection = 1;
+				downsectionno = atoi(optarg);
 				option = 1;
 				break;
 			case 'l':
@@ -189,7 +196,21 @@ int main(int argc, char *argv[])
 				downloadissue(&options, issue[i], force);
 		}
 		else if(downissueno >= 0 && downissueno <= no_of_issues)
-			downloadissue(&options, issue[downissueno], force);
+		{
+			if(downsection && downsectionno >= 0 && downsectionno <= issue[downissueno]->no_of_sections)
+			{
+				char downdir[STR_MAX];
+				sec * cursec;
+				strncpy(downdir, (char *) getissuedir(&options, issue[downissueno]), STR_MAX);
+				cursec = issue[downissueno]->section[downsectionno];
+
+				printf("Downloading %s to %s\n", cursec->title, downdir);
+
+				downloadsection(&options, cursec, &downdir, force);
+			}
+			else
+				downloadissue(&options, issue[downissueno], force);
+		}
 	}
 	
 

@@ -63,6 +63,7 @@ void showusage()
 	printf("-l | --list-issues            List available issues\n");
 	printf("-a | --download-all           Download all issues\n");
 	printf("-d | --download-issue issno   Download issue number issno\n");
+	printf("-s | --download-section secno Download section number secno\n");
 	printf("-f | --force                  Force re-download of existing files\n");
 	printf("-h | --help                   Print this help message\n");
 	printf("-q | --quiet                  Make output less verbose\n");
