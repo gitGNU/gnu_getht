@@ -79,7 +79,7 @@ int loadconfig(char * getht_path, struct config * options)
 				options->proxy.auth = CURLAUTH_NTLM;
 			else
 				fprintf(stderr,
-					"Proxy authentication method %s not known, please use basic, digest or ntlm",
+					"config.ini: Proxy authentication method %s not known, please use basic, digest or ntlm",
 					parameter);
 		}
 		else if(!strcmp(option, "proxy_user"))
@@ -87,7 +87,7 @@ int loadconfig(char * getht_path, struct config * options)
 		else if(!strcmp(option, "proxy_pass"))
 			strncpy(options->proxy.pass, parameter, STR_MAX);
 		else
-			fprintf(stderr, "Option '%s' not recognised, ignoring\n", option);
+			fprintf(stderr, "config.ini: Option '%s' not recognised, ignoring\n", option);
 	}
 
 	return 0;
