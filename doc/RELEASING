@@ -1,0 +1,32 @@
+== PROCEDURE FOR MAKING A NEW RELEASE ==
+
+- Source Tarball -
+1. Create a clean tarball, and sign & checksum it
+	./prepare-package.sh
+2. Upload tarball & related files
+	scp getht-*.tar.bz2* <user>@dl.sv.nongnu.org:/releases/getht/
+
+- Webpage -
+1. Download current webpage
+	wget http://www.nongnu.org/getht/
+2. Add new version information
+3. Upload updated webpace
+	scp index.html <user>@dl.sv.nongnu.org:/releases/getht/
+
+- Infrastructure -
+1. Add to new version option to bug tracker 
+	https://savannah.nongnu.org/bugs/admin/field_values.php?group_id=9005&list_value=1&field=release_id
+
+- Announcement -
+1. Post news to mailing list
+	getht-general@nongnu
+2. Post news to Savannah
+	https://savannah.nongnu.org/news/submit.php?group=getht
+3. Post new version to the following directories:
+	Freshmeat: http://freshmeat.net/add-release/64475/
+	IceWalkers: http://www.icewalkers.com/submit.php
+	SourceWell: http://sourcewell.berlios.de/updapp.php?id=3655
+
+- Clean up -
+1. Delete local copy of release files
+	rm index.html getht-*.tar.bz2*
