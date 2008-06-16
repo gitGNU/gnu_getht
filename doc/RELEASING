@@ -1,5 +1,11 @@
 == PROCEDURE FOR MAKING A NEW RELEASE ==
 
+- Version Number -
+1. Set version number in source file
+	src/version.h
+2. Set version number in autoconf script
+	configure.ac : AC_INIT
+
 - Source Tarball -
 1. Create a clean tarball, and sign & checksum it
 	./prepare-package.sh
