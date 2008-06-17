@@ -3,8 +3,6 @@
 - Version Number -
 1. Set version number in source file
 	src/version.h
-2. Set version number in autoconf script
-	configure.ac : AC_INIT
 
 - Source Tarball -
 1. Create a clean tarball, and sign & checksum it
@@ -36,3 +34,6 @@
 - Clean up -
 1. Delete local copy of release files
 	rm index.html getht-*.tar.bz2*
+
+- Packaging -
+1. Update packages maintained
