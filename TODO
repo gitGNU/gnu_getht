@@ -1,0 +1,57 @@
+-for the 0.1 release:
+/resume support
+/improve config option names *
+/code cleanup
+/add option to allow individual section downloading
+/add option 'quiet' to stop display of download status
+/nicer output
+
+* = breaks backward compatibility
+
+-------------
+
+-core-
+
+small features:
+
+use asciidoc for man / info pages
+improve the location of pdf downloads - no need to be compatible, & designed for human-filesystem use
+
+-------------
+
+-cli-
+
+allow multiple -d or -s at a time to download multiple sections. could use an array pointer to do it
+
+-------------
+
+-gui-
+
+remember: most important thing is to have functional code first - can work on user-friendliness later
+
+make a git branch for it
+adapt loosely from gui branch (still local at present)
+have optional save to dir dialog
+don't have download status pop-up have a status/progress bar with each list item
+
+-------------
+
+-meta-
+
+packaging:
+
+submit gentoo ebuild to bug tracker & link to it from getht's page
+create a debian/ubuntu deb - see https://help.ubuntu.com/ubuntu/packagingguide/C/basic-debhelper.htm & https://help.ubuntu.com/ubuntu/packagingguide/C/basic-cdbs.html
+
+savannah:
+
+perhaps just use webspace rather than recipe tracker
+simplify install recipe
+add a recipe for uninstalling (i.e. if dir no longer exists, download SAME VERSION and follow 'til make install, where make uninstall is done instead, then delete dir)
+add a recipe for running from cron to automatically get new issues
+
+spreading the word:
+
+submit to the gnu directory
+submit to apps using curl?
+
