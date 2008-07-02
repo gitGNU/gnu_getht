@@ -27,7 +27,7 @@ echo Packaging GetHT version $VERSION
 
 echo Copying sources to a temporary directory
 rm -rf $TMPDIR/getht-$VERSION && \
-git clone . $TMPDIR/getht-version && \
+git clone . $TMPDIR/getht-$VERSION && \
 cd $TMPDIR/getht-$VERSION
 
 # ensure version number in configure.ac is set correctly
