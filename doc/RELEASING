@@ -4,7 +4,7 @@
 1. Set version number in source file
 	src/version.h
 2. Tag current commit in git
-	git-tag -s vX.X HEAD
+	git-tag -s vX.X
 
 - Source Tarball -
 1. Create a clean tarball, and sign & checksum it
