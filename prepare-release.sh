@@ -41,7 +41,7 @@ make clean
 
 echo Cleaning up working directory
 rm -rf autom4te.cache
-rm -rf .git*
+rm -rf .git* */.git*
 rm "$0"
 
 echo Packaging into a tarball
