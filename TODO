@@ -1,12 +1,4 @@
--for the 0.1 release:
-/resume support
-/improve config option names *
-/code cleanup
-/add option to allow individual section downloading
-/add option 'quiet' to stop display of download status
-/nicer output
-
-* = breaks backward compatibility
+== GETHT TODO ==
 
 -------------
 
