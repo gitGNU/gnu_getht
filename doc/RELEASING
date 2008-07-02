@@ -3,19 +3,24 @@
 - Version Number -
 1. Set version number in source file
 	src/version.h
+2. Tag current commit in git
+	git-tag vX.X HEAD
 
 - Source Tarball -
 1. Create a clean tarball, and sign & checksum it
-	./prepare-package.sh
+	./prepare-release.sh
 2. Upload tarball & related files
 	scp getht-*.tar.bz2* <user>@dl.sv.nongnu.org:/releases/getht/
 
-- Webpage -
-1. Download current webpage
-	wget http://www.nongnu.org/getht/
+- Webpages -
+1. Download downloads webpage
+	wget http://download.savannah.gnu.org/releases/getht/
 2. Add new version information
-3. Upload updated webpace
+3. Upload updated webpage
 	scp index.html <user>@dl.sv.nongnu.org:/releases/getht/
+4. Take screenshot of new version
+5. Upload new screenshot
+	cvs commit
 
 - Infrastructure -
 1. Add to new version option to bug tracker 
