@@ -5,6 +5,7 @@
 	src/version.h
 2. Tag current commit in git
 	git-tag -s vX.X
+	git-push --tags
 
 - Source Tarball -
 1. Create a clean tarball, and sign & checksum it
