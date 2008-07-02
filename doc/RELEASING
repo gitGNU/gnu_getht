@@ -13,7 +13,7 @@
 	scp getht-*.tar.bz2* <user>@dl.sv.nongnu.org:/releases/getht/
 
 - Webpages -
-1. Download downloads webpage
+1. Get downloads webpage
 	wget http://download.savannah.gnu.org/releases/getht/
 2. Add new version information
 3. Upload updated webpage
