@@ -41,7 +41,8 @@ make clean
 
 echo Cleaning up working directory
 rm -rf autom4te.cache
-rm prepare-package.sh
+rm -rf .git*
+rm "$0"
 
 echo Packaging into a tarball
 cd ..
@@ -57,7 +58,7 @@ echo Signing package
 gpg -b getht-$VERSION.tar.bz2
 
 echo Checksumming package
-sha1sum getht-$VERSION.tar.bz2
+sha1sum getht-$VERSION.tar.bz2 > getht-$VERSION.tar.bz2.sha1
 
 echo "Packaging of GetHT $VERSION complete."
 echo "The tarball resides at ./getht-$VERSION.tar.bz2"
