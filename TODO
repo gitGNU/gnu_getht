@@ -4,8 +4,6 @@
 
 -core-
 
-small features:
-
 use asciidoc for man / info pages
 improve the location of pdf downloads - no need to be compatible, & designed for human-filesystem use
 
