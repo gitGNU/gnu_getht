@@ -75,16 +75,6 @@ int main(int argc, char *argv[])
 	if(loadconfig(getht_path, &options) != 0)
 		writefreshconfig(getht_path, &options);
 
-	if(!opendir(options.save_path))
-		if(mkdir(options.save_path, S_IRWXU | S_IRGRP | S_IXGRP | S_IROTH | S_IXOTH))
-		{
-			fprintf(stderr,"Cannot open/create directory %s",options.save_path);
-			printf("Please enter the path of a directory to save issues in: ");
-			scanf("%s", options.save_path);
-
-			updateconfig(getht_path, &options);
-		}
-
 	/* Parse command line options */
 	char c;
 	static struct option long_opts[] =

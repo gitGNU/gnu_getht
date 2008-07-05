@@ -175,22 +175,51 @@ double getremotefilesize(char *uri, struct config * options)
 	return filesize;
 }
 
+char * checkdir(char * dir)
+/* Checks that dir is writable. If necessary prompt
+ * the user for a new directory and return it. */
+{
+	int dirchanged = 0;
+
+	if(!opendir(dir))
+		while(mkdir(dir, S_IRWXU | S_IRGRP | S_IXGRP | S_IROTH | S_IXOTH))
+		{
+			fprintf(stderr,"Cannot create directory %s\n", dir);
+			printf("Please enter the path of a save directory: ");
+			scanf("%s", dir);
+			dirchanged = 1;
+		}
+
+	if(dirchanged)
+		return dir;
+	else
+		return 0;
+}
+
 char * getissuedir(struct config * options, iss * issue)
 /*	Returns and prepares download directory */
 {
+	char * newsavedir;
 	char * newdir;
 
+	newsavedir = malloc(STR_MAX);
 	newdir = malloc(STR_MAX);
+
+	/* Check that main save path is ok */
+	newsavedir = checkdir(options->save_path);
+	/* Save the new save path if it changed */
+	if(newsavedir)
+	{
+		char getht_path[STR_MAX];
+		snprintf(getht_path,STR_MAX,"%s/.getht",getenv("HOME"));
+		updateconfig(getht_path, &options);
+	}
 
 	snprintf(newdir,STR_MAX,"%s/%i_%i-%i",options->save_path,
 		issue->date.year,issue->date.firstmonth,issue->date.lastmonth);
 
-	if(!opendir(newdir))
-		if(mkdir(newdir, S_IRWXU | S_IRGRP | S_IXGRP | S_IROTH | S_IXOTH))
-		{
-			printf("Please enter the path of a directory to save issues in: ");
-			scanf("%s", newdir);
-		}
+	/* Check that specific issue path is ok */
+	checkdir(newdir);
 
 	return newdir;
 }
