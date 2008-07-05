@@ -90,6 +90,8 @@ int loadconfig(char * getht_path, struct config * options)
 			fprintf(stderr, "config.ini: Option '%s' not recognised, ignoring\n", option);
 	}
 
+	fclose(config_file);
+
 	return 0;
 }
 
@@ -142,6 +144,8 @@ int writefreshconfig(char * getht_path, struct config * options)
 	if(options->proxy.pass[0])
 		fprintf(config_file, "%s = %s\n", "proxy_pass", options->proxy.pass);
 		
+	fclose(config_file);
+
 	return 0;
 }
 
@@ -160,7 +164,9 @@ int updateconfig(char * getht_path, struct config * options)
 		return 1;
 	}
 
-	fprintf(stderr,"Not yet implemented.\n");
+	/* Not yet implemented */
+
+	fclose(config_file);
 
 	return 1;
 }
