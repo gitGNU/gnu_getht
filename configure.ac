@@ -4,7 +4,7 @@
 AC_PREREQ([2.63])
 AC_INIT([getht], [0.1])
 AC_CONFIG_HEADERS([config.h])
-AM_INIT_AUTOMAKE()
+AM_INIT_AUTOMAKE([-Wall -Werror])
 
 # Checks for programs.
 AC_PROG_CC
