@@ -133,7 +133,7 @@ int main(int argc, char *argv[])
 				option = 1;
 				break;
 			case 'V':
-				printf("GetHT version: %s\n",PACKAGE_VERSION);
+				printf("%s version: %s\n",PACKAGE_NAME, PACKAGE_VERSION);
 				option = 1;
 				return 0;
 				break;
