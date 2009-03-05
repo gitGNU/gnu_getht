@@ -18,6 +18,7 @@
  * 
  */
 
+#include <config.h>
 #include <stdio.h>
 #include <stdlib.h>
 #include <unistd.h>
@@ -26,7 +27,6 @@
 #include <sys/stat.h>
 #include <curl/curl.h>
 
-#include "version.h"
 #include "issue.h"
 #include "getht.h"
 
@@ -133,7 +133,7 @@ int main(int argc, char *argv[])
 				option = 1;
 				break;
 			case 'V':
-				printf("GetHT version: %s\n",VERSION);
+				printf("GetHT version: %s\n",PACKAGE_VERSION);
 				option = 1;
 				return 0;
 				break;
