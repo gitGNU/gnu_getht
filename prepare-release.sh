@@ -20,8 +20,8 @@
 TMPDIR="/tmp"
 ORIGDIR=$(pwd)
 
-VERSION=$(gawk -F \" '{print $2}' src/version.h | \
-	sed -e ':a;N;$!ba;s/\n//g')
+VERSION=$(grep AC_INIT configure.ac | \
+	awk -F \[ '{print $3}' | awk -F \] '{print $1}')
 
 echo Packaging GetHT version $VERSION
 
