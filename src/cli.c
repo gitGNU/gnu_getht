@@ -58,15 +58,22 @@ void list_issues(iss ** issue, int no_of_issues, int verbose)
 
 void showusage()
 {
-	printf("Usage: getht [-ulafhvV] [-d issno]\n");
-	printf("-u | --update                 Update contents files\n");
-	printf("-l | --list-issues            List available issues\n");
-	printf("-a | --download-all           Download all issues\n");
-	printf("-d | --download-issue issno   Download issue number issno\n");
-	printf("-s | --download-section secno Download section number secno\n");
-	printf("-f | --force                  Force re-download of existing files\n");
-	printf("-h | --help                   Print this help message\n");
-	printf("-q | --quiet                  Make output less verbose\n");
-	printf("-v | --verbose                Make output more verbose\n");
-	printf("-V | --version                Print version information\n");
+	printf("Usage: getht [options] -a\n");
+	printf("  or: getht [options] -d issno [-s secno]\n");
+	printf("  or: getht [options] -l\n");
+	printf("Downloads issue(s) of Hinduism Today\n\n");
+	printf("Download options:\n");
+	printf("  -a, --download-all            Download all issues\n");
+	printf("  -d, --download-issue issno    Download issue number issno\n");
+	printf("  -s, --download-section secno  Download section number secno\n");
+	printf("  -f, --force                   Force re-download of existing files\n");
+	printf("Discovery options:\n");
+	printf("  -l, --list-issues             List available issues\n");
+	printf("  -u, --update                  Update contents files\n");
+	printf("Global options:\n");
+	printf("  -q, --quiet                   Make output less verbose\n");
+	printf("  -v, --verbose                 Make output more verbose\n");
+	printf("Other options:\n");
+	printf("  -h, --help                    Print this help message\n");
+	printf("  -V, --version                 Print version information\n");
 }
