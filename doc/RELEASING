@@ -1,8 +1,8 @@
 == PROCEDURE FOR MAKING A NEW RELEASE ==
 
 - Version Number -
-1. Set version number in source file
-	src/version.h
+1. Set version number in build system
+	configure.ac
 2. Tag current commit in git
 	git-tag -s vX.X
 	git-push --tags
