@@ -7,6 +7,8 @@
 use asciidoc for man / info pages
 improve the location of pdf downloads - no need to be compatible, & designed for human-filesystem use
 return error if issue / section number doesn't exist
+run through valgrind & splint
+rewrite memory handling
 
 -------------
 
@@ -31,6 +33,7 @@ don't have download status pop-up have a status/progress bar with each list item
 
 packaging:
 
+consider: replace packaging script with make dist rule, ala http://www.freesoftwaremagazine.com/books/agaal/automatically_writing_makefiles_with_autotools
 submit gentoo ebuild to bug tracker & link to it from getht's page
 create a debian/ubuntu deb - see https://help.ubuntu.com/ubuntu/packagingguide/C/basic-debhelper.htm & https://help.ubuntu.com/ubuntu/packagingguide/C/basic-cdbs.html
 
