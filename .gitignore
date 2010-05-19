@@ -1,13 +1,1 @@
-# ignore auto-generated autoconf files
-Makefile
-Makefile.in
-aclocal.m4
-stamp-h1
-config.h
-config.h.in
-config.h.log
-config.log
-config.status
-config
-configure
-autom4te.cache
+getht

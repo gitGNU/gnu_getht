@@ -1,33 +1,20 @@
 /*
- * Copyright 2006,2008 Nick White
- *
  * This file is part of GetHT
  *
- * GetHT is free software: you can redistribute it and/or modify
- * it under the terms of the GNU General Public License as published by
- * the Free Software Foundation, either version 3 of the License, or
- * (at your option) any later version.
+ * See COPYING file for copyright, license and warranty details.
  *
- * GetHT is distributed in the hope that it will be useful,
- * but WITHOUT ANY WARRANTY; without even the implied warranty of
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
- * GNU General Public License for more details.
- *
- * You should have received a copy of the GNU General Public License
- * along with GetHT.  If not, see <http://www.gnu.org/licenses/>.
- * 
  */
 
-#include <config.h>
 #include <stdio.h>
 #include <stdlib.h>
 #include <unistd.h>
 #include <getopt.h>
 #include <string.h>
 #include <sys/stat.h>
+#include <sys/types.h>
+#include <dirent.h>
 #include <curl/curl.h>
 
-#include "issue.h"
 #include "getht.h"
 
 int update_contents_files(struct config * options);
@@ -133,7 +120,7 @@ int main(int argc, char *argv[])
 				option = 1;
 				break;
 			case 'V':
-				printf("%s version: %s\n",PACKAGE_NAME, PACKAGE_VERSION);
+				printf("GetHT version: %s\n", VERSION);
 				option = 1;
 				return 0;
 				break;
@@ -196,7 +183,7 @@ int main(int argc, char *argv[])
 
 				printf("Downloading %s to %s\n", cursec->title, downdir);
 
-				downloadsection(&options, cursec, &downdir, force);
+				downloadsection(&options, cursec, downdir, force);
 			}
 			else
 				downloadissue(&options, issue[downissueno], force);

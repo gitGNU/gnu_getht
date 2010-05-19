@@ -24,7 +24,7 @@ libxml2 2.0.0+
 libcurl 7.7.2+
 
 -Install
-For details on how to install GetHT see the INSTALL file.
+make && make install
 
 -Proxy Support
 GetHT supports HTTP, SOCKS4 & SOCKS5 proxys (though they haven't been

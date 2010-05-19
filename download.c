@@ -1,32 +1,21 @@
 /*
- * Copyright 2006,2008 Nick White
- *
  * This file is part of GetHT
  *
- * GetHT is free software: you can redistribute it and/or modify
- * it under the terms of the GNU General Public License as published by
- * the Free Software Foundation, either version 3 of the License, or
- * (at your option) any later version.
+ * See COPYING file for copyright, license and warranty details.
  *
- * GetHT is distributed in the hope that it will be useful,
- * but WITHOUT ANY WARRANTY; without even the implied warranty of
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
- * GNU General Public License for more details.
- *
- * You should have received a copy of the GNU General Public License
- * along with GetHT.  If not, see <http://www.gnu.org/licenses/>.
- * 
  */
 
 #include <stdio.h>
+#include <stdlib.h>
 #include <string.h>
 #include <sys/stat.h>
+#include <sys/types.h>
+#include <dirent.h>
 #include <curl/curl.h>
 #include <curl/types.h>
 #include <curl/easy.h>
 
 #include "getht.h"
-#include "issue.h"
 
 int read_func(void *ptr, size_t size, size_t nmemb, FILE *stream)
 	{ return fread(ptr, size, nmemb, stream); }
@@ -212,7 +201,7 @@ char * getissuedir(struct config * options, iss * issue)
 	{
 		char getht_path[STR_MAX];
 		snprintf(getht_path,STR_MAX,"%s/.getht",getenv("HOME"));
-		updateconfig(getht_path, &options);
+		updateconfig(getht_path, options);
 	}
 
 	snprintf(newdir,STR_MAX,"%s/%i_%i-%i",options->save_path,

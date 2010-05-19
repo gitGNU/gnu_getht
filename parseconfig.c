@@ -1,24 +1,12 @@
 /*
- * Copyright 2006,2008 Nick White
- *
  * This file is part of GetHT
  *
- * GetHT is free software: you can redistribute it and/or modify
- * it under the terms of the GNU General Public License as published by
- * the Free Software Foundation, either version 3 of the License, or
- * (at your option) any later version.
+ * See COPYING file for copyright, license and warranty details.
  *
- * GetHT is distributed in the hope that it will be useful,
- * but WITHOUT ANY WARRANTY; without even the implied warranty of
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
- * GNU General Public License for more details.
- *
- * You should have received a copy of the GNU General Public License
- * along with GetHT.  If not, see <http://www.gnu.org/licenses/>.
- * 
  */
 
 #include <stdio.h>
+#include <stdlib.h>
 #include <string.h>
 
 #include "getht.h"
@@ -129,14 +117,14 @@ int writefreshconfig(char * getht_path, struct config * options)
 	if(options->proxy.address[0])
 		fprintf(config_file, "%s = %s\n", "proxy_address", options->proxy.address);
 	if(options->proxy.port)
-		fprintf(config_file, "%s = %i\n", "proxy_port", options->proxy.port);
+		fprintf(config_file, "%s = %li\n", "proxy_port", options->proxy.port);
 	if(options->proxy.auth)
 	{
-		if(options->proxy.auth = CURLAUTH_BASIC)
+		if(options->proxy.auth == CURLAUTH_BASIC)
 			fprintf(config_file, "%s = %s\n", "proxy_auth", "basic");
-		else if(options->proxy.auth = CURLAUTH_DIGEST)
+		else if(options->proxy.auth == CURLAUTH_DIGEST)
 			fprintf(config_file, "%s = %s\n", "proxy_auth", "digest");
-		else if(options->proxy.auth = CURLAUTH_NTLM)
+		else if(options->proxy.auth == CURLAUTH_NTLM)
 			fprintf(config_file, "%s = %s\n", "proxy_auth", "ntlm");
 	}
 	if(options->proxy.user[0])

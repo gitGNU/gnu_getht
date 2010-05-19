@@ -1,21 +1,8 @@
 /*
- * Copyright 2006,2008 Nick White
- *
  * This file is part of GetHT
  *
- * GetHT is free software: you can redistribute it and/or modify
- * it under the terms of the GNU General Public License as published by
- * the Free Software Foundation, either version 3 of the License, or
- * (at your option) any later version.
+ * See COPYING file for copyright, license and warranty details.
  *
- * GetHT is distributed in the hope that it will be useful,
- * but WITHOUT ANY WARRANTY; without even the implied warranty of
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
- * GNU General Public License for more details.
- *
- * You should have received a copy of the GNU General Public License
- * along with GetHT.  If not, see <http://www.gnu.org/licenses/>.
- * 
  */
 
 #include <stdio.h>
@@ -24,7 +11,6 @@
 #include <libxml/xmlmemory.h>
 #include <libxml/parser.h>
 
-#include "issue.h"
 #include "getht.h"
 
 iss ** parsetoc(char *filepath, int * iss_no);
@@ -50,18 +36,16 @@ iss ** parsetoc(char *filepath, int * iss_no)
 
 	iss ** issue = NULL;
 
-	int year;
-
 	xmlNodePtr cnode;
 
 	while(node != NULL)
 	{
-		if(!xmlStrncmp(node->name,(char *) "year",4))
+		if(!xmlStrncmp(node->name,(unsigned char *) "year",4))
 		{
 			cnode = node->children;
 			while(cnode != NULL)
 			{
-    				if(!xmlStrncmp(cnode->name,(char *) "issue",5))
+    				if(!xmlStrncmp(cnode->name,(unsigned char *) "issue",5))
 				{
 					/* assign memory for the new issue */
 					issue = assignnew_iss(issue, &no_of_issues);
@@ -71,7 +55,7 @@ iss ** parsetoc(char *filepath, int * iss_no)
 					issue[no_of_issues]->date.year =
 						atoi( (const char *)(xmlStrsub(node->name,5,4)) );
 					tokenise_hyphons(
-							xmlStrsub(cnode->name,6,5),
+							(char *) xmlStrsub(cnode->name,6,5),
 							&(issue[no_of_issues]->date.firstmonth),
 							&(issue[no_of_issues]->date.lastmonth));
 
@@ -96,13 +80,13 @@ iss ** parsetoc(char *filepath, int * iss_no)
 int parseissue(xmlDocPtr file, xmlNodePtr node, iss * cur_issue)
 /*	parses issue from xml, saving in cur_issue structure	*/
 {
-	strncpy(cur_issue->title, (char *) xmlGetProp(node, "title"), STR_MAX);
-	strncpy(cur_issue->preview_uri, (char *) xmlGetProp(node, "coverlink"), STR_MAX);
+	strncpy(cur_issue->title, (char *) xmlGetProp(node, (unsigned char *)"title"), STR_MAX);
+	strncpy(cur_issue->preview_uri, (char *) xmlGetProp(node, (unsigned char *) "coverlink"), STR_MAX);
 
 	node = node->xmlChildrenNode;
 
 	while(node != NULL){
-		if(!xmlStrncmp(node->name, (char *) "section",7) ||
+		if(!xmlStrncmp(node->name, (unsigned char *) "section",7) ||
 			!xmlStrcmp(node->name, (const xmlChar *) "cover"))
 		{
 			/* assign memory for new section */
@@ -126,8 +110,8 @@ void parsesection(xmlDocPtr file, xmlNodePtr node, sec * cur_section)
 {
 	it * cur_item = NULL;
 
-	strncpy(cur_section->uri, (char *) xmlGetProp(node, "pdflink"), STR_MAX);
-	strncpy(cur_section->title, (char *) xmlGetProp(node, "title"), STR_MAX);
+	strncpy(cur_section->uri, (char *) xmlGetProp(node, (unsigned char *) "pdflink"), STR_MAX);
+	strncpy(cur_section->title, (char *) xmlGetProp(node, (unsigned char *) "title"), STR_MAX);
 
 	if(!xmlStrcmp(node->name, (const xmlChar *) "cover"))
 		cur_section->number = 0;
@@ -137,8 +121,6 @@ void parsesection(xmlDocPtr file, xmlNodePtr node, sec * cur_section)
 	node = node->xmlChildrenNode;
 
 	char * pagenums;
-
-	it ** tmp = NULL;
 
 	while(node != NULL)
 	{
@@ -154,8 +136,8 @@ void parsesection(xmlDocPtr file, xmlNodePtr node, sec * cur_section)
 				cur_item = cur_section->item[cur_section->no_of_items];
 
 				/* parse item */
-				cur_item->title = xmlNodeListGetString(file, node->xmlChildrenNode, 1);
-				if(pagenums = (char *) xmlGetProp(node, "pages"))
+				cur_item->title = (char *) xmlNodeListGetString(file, node->xmlChildrenNode, 1);
+				if(pagenums == (char *) xmlGetProp(node, (unsigned char *) "pages"))
 					tokenise_hyphons(pagenums, &(cur_item->firstpage), &(cur_item->lastpage));
 				else
 				{
@@ -233,19 +215,19 @@ int cur_identifiers(char * filepath, char * title, issdates * date)
 	xmlChar *temp;
 	while(node != NULL)
 	{
-		if(!xmlStrncmp(node->name,(char *) "year",4))
+		if(!xmlStrncmp(node->name,(unsigned char *) "year",4))
 		{
 			cnode = node->children;
 			while(cnode != NULL)
 			{
-	   		    if(!xmlStrncmp(cnode->name,(char *) "issue",5))
+	   		    if(!xmlStrncmp(cnode->name,(unsigned char *) "issue",5))
 				{
-					temp = xmlGetProp(cnode, "current");
+					temp = xmlGetProp(cnode, (unsigned char *) "current");
         			if(temp)
         			{
-        			    strncpy(title, (char *) xmlGetProp(cnode, "title"), STR_MAX);
+        			    strncpy(title, (char *) xmlGetProp(cnode, (unsigned char *) "title"), STR_MAX);
 						date->year = atoi( (const char *)(xmlStrsub(node->name,5,4)) );
-						tokenise_hyphons(xmlStrsub(cnode->name,6,5), &(date->firstmonth), &(date->lastmonth));
+						tokenise_hyphons((char *)xmlStrsub(cnode->name,6,5), &(date->firstmonth), &(date->lastmonth));
 						return 0;
         			}
 				}
