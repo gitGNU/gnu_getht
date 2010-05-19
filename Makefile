@@ -6,7 +6,7 @@ TARGET = getht
 SRC = $(shell find . -name '*.c')
 OBJ = $(SRC:.c=.o)
 MAN = $(TARGET:=.1)
-DOC = README
+DOC = README COPYING
 
 all: $(TARGET)
 
@@ -17,9 +17,9 @@ $(TARGET): $(OBJ)
 	cc -o $@ $(OBJ) $(LDFLAGS)
 
 clean:
-	rm -f -- $(TARGET) $(OBJ)
+	rm -f -- $(TARGET) $(OBJ) getht-*.tar.bz2*
 
-install:
+install: all
 	mkdir -p $(DESTDIR)$(PREFIX)/bin
 	cp -f $(TARGET) $(DESTDIR)$(PREFIX)/bin
 	mkdir -p $(DESTDIR)$(MANPREFIX)/man1
@@ -31,7 +31,7 @@ uninstall:
 
 dist: clean
 	mkdir -p getht-$(VERSION)
-	cp -R $(SRC) $(DOC) getht-$(VERSION)
+	cp -R $(SRC) $(DOC) Makefile config.mk getht-$(VERSION)
 	sed "s/VERSION/$(VERSION)/g" < $(MAN) > getht-$(VERSION)/$(MAN)
 	tar -c getht-$(VERSION) > getht-$(VERSION).tar
 	bzip2 < getht-$(VERSION).tar > getht-$(VERSION).tar.bz2
