@@ -26,7 +26,7 @@ clean:
 
 dist: clean
 	@mkdir -p ${NAME}-${VERSION}
-	@cp -R ${SRC} Makefile config.mk COPYING README ${NAME}-${VERSION}
+	@cp -R ${SRC} ${NAME}.h Makefile config.mk COPYING README ${NAME}-${VERSION}
 	@for i in ${MAN}; do \
 		sed "s/VERSION/${VERSION}/g" < $$i > ${NAME}-${VERSION}/$$i; done
 	@tar -c ${NAME}-${VERSION} | gzip -c > ${NAME}-${VERSION}.tar.gz
