@@ -1,9 +1,8 @@
 # See COPYING file for copyright, license and warranty details.
 
-VERSION = 0.2
+VERSION = 0.3
 
 # paths
-#PREFIX = /usr/local
 PREFIX = /usr/local
 MANPREFIX = ${PREFIX}/share/man
 
