@@ -3,6 +3,7 @@
 VERSION = 0.2
 
 # paths
+#PREFIX = /usr/local
 PREFIX = /usr/local
 MANPREFIX = ${PREFIX}/share/man
 
@@ -16,7 +17,6 @@ XMLINC = $(shell pkg-config --cflags libxml-2.0)
 XMLLIB = $(shell pkg-config --libs libxml-2.0)
 
 # flags
-#CFLAGS = -pedantic -Wall -Werror ${INCS} ${CURLINC} ${XMLINC} -DVERSION=\"${VERSION}\"
 CFLAGS = -std=c99 -Wall -Werror ${INCS} ${CURLINC} ${XMLINC} -DVERSION=\"${VERSION}\"
 LDFLAGS = ${LIBS} ${CURLLIB} ${XMLLIB}
 

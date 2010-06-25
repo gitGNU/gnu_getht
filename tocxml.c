@@ -109,6 +109,7 @@ void parsesection(xmlDocPtr file, xmlNodePtr node, sec * cur_section)
 /*	parses section xml, filling cur_section structure */
 {
 	it * cur_item = NULL;
+	char * pagenums = "";
 
 	strncpy(cur_section->uri, (char *) xmlGetProp(node, (unsigned char *) "pdflink"), STR_MAX);
 	strncpy(cur_section->title, (char *) xmlGetProp(node, (unsigned char *) "title"), STR_MAX);
@@ -119,8 +120,6 @@ void parsesection(xmlDocPtr file, xmlNodePtr node, sec * cur_section)
 		cur_section->number = atoi( (const char *)(xmlStrsub(node->name,8,1)) );
 
 	node = node->xmlChildrenNode;
-
-	char * pagenums;
 
 	while(node != NULL)
 	{

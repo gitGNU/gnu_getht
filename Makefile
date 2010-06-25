@@ -1,40 +1,58 @@
 # See COPYING file for copyright, license and warranty details.
 
+NAME = getht
+SRC = cli.c download.c getht.c issuemem.c parseconfig.c tocxml.c xml.c
+TARGETS = ${NAME}
+
+OBJ = ${SRC:.c=.o}
+MAN = ${TARGETS:=.1}
+
 include config.mk
 
-TARGET = getht
-SRC = $(shell find . -name '*.c')
-OBJ = $(SRC:.c=.o)
-MAN = $(TARGET:=.1)
-DOC = README COPYING
+all: ${TARGETS}
 
-all: $(TARGET)
+${OBJ}: config.mk
 
-$(TARGET:=.o): $(SRC)
-	cc -c $(SRC) $(CFLAGS)
+.c.o:
+	@echo CC $<
+	@cc -c ${CFLAGS} $<
 
-$(TARGET): $(OBJ)
-	cc -o $@ $(OBJ) $(LDFLAGS)
+$(TARGETS): $(OBJ)
+	@echo LD $@
+	@cc -o $@ $(OBJ) $(LDFLAGS)
 
 clean:
-	rm -f -- $(TARGET) $(OBJ) getht-*.tar.bz2*
-
-install: all
-	mkdir -p $(DESTDIR)$(PREFIX)/bin
-	cp -f $(TARGET) $(DESTDIR)$(PREFIX)/bin
-	mkdir -p $(DESTDIR)$(MANPREFIX)/man1
-	cp -f $(MAN) $(DESTDIR)$(MANPREFIX)/man1
-
-uninstall:
-	rm -f $(DESTDIR)$(PREFIX)/bin/$(TARGET)
-	rm -f $(DESTDIR)$(MANPREFIX)/man1/$(MAN)
+	rm -f -- ${TARGETS} ${OBJ} ${NAME}-${VERSION}.tar.gz ${NAME}-${VERSION}.tar.gz.sig
 
 dist: clean
-	mkdir -p getht-$(VERSION)
-	cp -R $(SRC) $(DOC) Makefile config.mk getht-$(VERSION)
-	sed "s/VERSION/$(VERSION)/g" < $(MAN) > getht-$(VERSION)/$(MAN)
-	tar -c getht-$(VERSION) > getht-$(VERSION).tar
-	bzip2 < getht-$(VERSION).tar > getht-$(VERSION).tar.bz2
-	rm -rf getht-$(VERSION).tar getht-$(VERSION)
-	gpg -b < getht-$(VERSION).tar.bz2 > getht-$(VERSION).tar.bz2.sig
-	sha1sum < getht-$(VERSION).tar.bz2 > getht-$(VERSION).tar.bz2.sha1
+	@mkdir -p ${NAME}-${VERSION}
+	@cp -R ${SRC} Makefile config.mk COPYING README ${NAME}-${VERSION}
+	@for i in ${MAN}; do \
+		sed "s/VERSION/${VERSION}/g" < $$i > ${NAME}-${VERSION}/$$i; done
+	@tar -c ${NAME}-${VERSION} | gzip -c > ${NAME}-${VERSION}.tar.gz
+	@gpg -b < ${NAME}-${VERSION}.tar.gz > ${NAME}-${VERSION}.tar.gz.sig
+	@rm -rf ${NAME}-${VERSION}
+	@echo ${NAME}-${VERSION}.tar.gz ${NAME}-${VERSION}.tar.gz.sig
+
+install: all
+	@echo installing executables to ${DESTDIR}${PREFIX}/bin
+	@mkdir -p ${DESTDIR}${PREFIX}/bin
+	@for i in ${TARGETS}; do \
+		cp -f $$i ${DESTDIR}${PREFIX}/bin/$$i; \
+		chmod 755 ${DESTDIR}${PREFIX}/bin/$$i; done
+	@echo installing manual pages to ${DESTDIR}${MANPREFIX}/man1
+	@mkdir -p ${DESTDIR}${MANPREFIX}/man1
+	@for i in ${MAN}; do \
+		sed "s/VERSION/${VERSION}/g" < $$i > ${DESTDIR}${MANPREFIX}/man1/$$i; \
+		chmod 644 ${DESTDIR}${MANPREFIX}/man1/$$i; done
+
+uninstall:
+	@echo uninstalling executables from ${DESTDIR}${PREFIX}/bin
+	@for i in ${TARGETS}; do rm -f ${DESTDIR}${PREFIX}/bin/$$i; done
+	@echo uninstalling manual pages from ${DESTDIR}${MANPREFIX}/man1
+	@for i in ${MAN}; do rm -f ${DESTDIR}${MANPREFIX}/man1/$$i; done
+
+test: all
+	@echo no tests yet!
+
+.PHONY: all clean dist install uninstall test
